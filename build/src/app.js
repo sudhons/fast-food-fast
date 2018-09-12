@@ -1,5 +1,10 @@
 "use strict";
 
-var ade = function ade(a) {
-  return a * 2;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var multiply = function multiply(a, b) {
+  return a * b;
 };
+
+exports.default = multiply;
