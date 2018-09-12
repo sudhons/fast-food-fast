@@ -4,9 +4,10 @@
   "description": "Fast-Food-Fast is a food delivery service app for a restaurant",
   "main": "app.js",
   "scripts": {
-    "test": "npm run build && nyc mocha ./build/test/",
+    "test": "npm run build && nyc mocha ./build/test/ --exit",
     "lint": "eslint ./api",
-    "build": "babel --presets env ./api -d ./build"
+    "build": "babel --presets env ./api -d ./build",
+    "start": "npm run build && node ./build/src/app.js"
   },
   "repository": {
     "type": "git",
