@@ -267,6 +267,7 @@ input[type="submit"]:hover {
 #declined-orders, #completed-orders,
 #add-new-food {
   display: none;
+  min-height: 100%;
 }
 
 .show {
@@ -470,16 +471,16 @@ ul .order-table > div:first-child:hover a {
   color: #fff;
 }
 
-.order-table.head, .order-table.foot {
+.order-table.head {
   text-transform: uppercase;
   background-color: #aaa;
-  
   padding: 0 .3rem;
 }
 
 #new-orders, #accepted-orders,
 #declined-orders, #completed-orders {
   box-shadow: 0 0 .5rem #4f4f4f;
+  border-bottom: solid 3rem  #aaa;
 }
 
 #new-orders li, #accepted-orders li,
