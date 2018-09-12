@@ -26,6 +26,21 @@ const selectItem = (e) => {
     case 'Previous orders':
       document.getElementById('previous-orders').className = 'show';
       break;
+    case 'New Orders':
+      document.getElementById('new-orders').className = 'show';
+      break;
+    case 'Accepted Orders':
+      document.getElementById('accepted-orders').className = 'show';
+      break;
+    case 'Declined Orders':
+      document.getElementById('declined-orders').className = 'show';
+      break;
+    case 'Completed Orders':
+      document.getElementById('completed-orders').className = 'show';
+      break;
+    case 'Add New Food':
+      document.getElementById('add-new-food').className = 'show';
+      break;
   }
 }
 
@@ -38,7 +53,7 @@ closeBtn.addEventListener('click', (e) => {
 openBtn.addEventListener('click', (e) => {
   e.preventDefault();
   menuBar.style.display = 'block';
-  menuBar.style.width = '13rem'
+  menuBar.style.width = '14rem'
   openBtn.style.display = 'none';
 });
 
