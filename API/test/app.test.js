@@ -3,7 +3,7 @@ import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 
 import app from '../src/app';
-import orderQueries from '../src/db/queries/orderQueries';
+import orderQueries from '../src/queries/orderQueries';
 
 chai.use(chaiHttp);
 
@@ -53,9 +53,7 @@ describe('App', () => {
           done();
         });
     });
-  });
 
-  describe('/GET /api/v1/orders', () => {
     it('should GET an array of orders', (done) => {
       orderQueries.createNewOrder(customer, recipientName, recipientAddress, recipientPhone, order);
       chai.request(app)

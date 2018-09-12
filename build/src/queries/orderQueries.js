@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _dbData = require('../dbData');
+var _dbData = require('../db/dbData');
 
 var _dbData2 = _interopRequireDefault(_dbData);
 
@@ -36,7 +36,7 @@ var Data = function () {
       var newOrder = new Data(customer, recipientName, recipientAddr, recipientPhone, order);
       _dbData2.default.push(newOrder);
 
-      return newOrder || null;
+      return newOrder;
     }
   }, {
     key: 'getAllOrders',
@@ -55,8 +55,10 @@ var Data = function () {
     key: 'updateOrderStatus',
     value: function updateOrderStatus(orderId, status) {
       var requiredOrder = Data.getAnOrder(orderId);
+
       if (requiredOrder) {
         requiredOrder.status = status;
+        requiredOrder[status + 'Time'] = Date.now();
       }
 
       return requiredOrder || null;

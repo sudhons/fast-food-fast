@@ -24,6 +24,7 @@ app.use(function (request, response, next) {
   return next(error);
 });
 
+// eslint-disable-next-line no-unused-vars
 app.use(function (error, request, response, next) {
   var status = error.status || 400;
   response.status(status);
@@ -32,8 +33,10 @@ app.use(function (error, request, response, next) {
 
 var PORT = parseInt(process.env.PORT, 10) || 5000;
 
-app.listen(PORT, function () {
-  return console.log('Listening on port ' + PORT);
-});
+if (require.main === module) {
+  app.listen(PORT, function () {
+    return console.log('Listening on port ' + PORT);
+  });
+}
 
 exports.default = app;

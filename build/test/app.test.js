@@ -12,7 +12,7 @@ var _app = require('../src/app');
 
 var _app2 = _interopRequireDefault(_app);
 
-var _orderQueries = require('../src/db/queries/orderQueries');
+var _orderQueries = require('../src/queries/orderQueries');
 
 var _orderQueries2 = _interopRequireDefault(_orderQueries);
 
@@ -61,9 +61,7 @@ describe('App', function () {
         done();
       });
     });
-  });
 
-  describe('/GET /api/v1/orders', function () {
     it('should GET an array of orders', function (done) {
       _orderQueries2.default.createNewOrder(customer, recipientName, recipientAddress, recipientPhone, order);
       _chai2.default.request(_app2.default).get('/api/v1/orders').end(function (error, response) {

@@ -1,4 +1,4 @@
-import Data from '../db/queries/orderQueries';
+import Data from '../queries/orderQueries';
 
 class Order {
   static getAllOrders(request, response) {

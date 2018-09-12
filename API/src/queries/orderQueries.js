@@ -1,4 +1,4 @@
-import orderData from '../dbData';
+import orderData from '../db/dbData';
 
 class Data {
   constructor(customer, recipientName, recipientAddr, recipientPhone, order) {
@@ -18,7 +18,7 @@ class Data {
     const newOrder = new Data(customer, recipientName, recipientAddr, recipientPhone, order);
     orderData.push(newOrder);
 
-    return newOrder || null;
+    return newOrder;
   }
 
   static getAllOrders() {
@@ -32,8 +32,10 @@ class Data {
 
   static updateOrderStatus(orderId, status) {
     const requiredOrder = Data.getAnOrder(orderId);
+
     if (requiredOrder) {
       requiredOrder.status = status;
+      requiredOrder[`${status}Time`] = Date.now();
     }
 
     return requiredOrder || null;

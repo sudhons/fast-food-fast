@@ -21,6 +21,8 @@ app.use((error, request, response, next) => {
 
 const PORT = parseInt(process.env.PORT, 10) || 5000;
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+}
 
 export default app;
