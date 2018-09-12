@@ -4,12 +4,11 @@
   "description": "Fast-Food-Fast is a food delivery service app for a restaurant",
   "main": "app.js",
   "scripts": {
-    "test": "npm run build && nyc mocha ./build/test/ --exit",
-    "test1": "npm run build && nyc mocha ./build/test/**/*.js --exit",
-    "test2": "mocha --compilers js:babel-resgister --recursive ./test",
+    "test": "npm run build && nyc mocha ./build/test/**/*.js --exit",
     "lint": "eslint ./api",
     "build": "babel --presets env ./api -d ./build",
-    "start": "npm run build && node ./build/src/app.js"
+    "start": "npm run build && node ./build/src/app.js",
+    "coveralls": "nyc report --report=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -31,6 +30,7 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
+    "coveralls": "^3.0.2",
     "eslint": "^4.9.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.7.0",
