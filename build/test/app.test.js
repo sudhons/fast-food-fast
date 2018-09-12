@@ -21,6 +21,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* eslint-env mocha */
 _chai2.default.use(_chaiHttp2.default);
 
+var customer = 'Adeolu';
+var recipientName = 'John Doe';
+var recipientPhone = '09009054321';
+var recipientAddress = '32 Araomi Onike Yaba';
+var order = [{ mealId: 90, quantity: 2 }];
+
 describe('App', function () {
   beforeEach(function (done) {
     _orderQueries2.default.deleteAllOrders();
@@ -52,6 +58,18 @@ describe('App', function () {
         _chai.assert.strictEqual(response.status, 200);
         _chai.assert.hasAllKeys(response.body, ['status', 'message', 'data']);
         _chai.assert.isEmpty(response.body.data);
+        done();
+      });
+    });
+  });
+
+  describe('/GET /api/v1/orders', function () {
+    it('should GET an array of orders', function (done) {
+      _orderQueries2.default.createNewOrder(customer, recipientName, recipientAddress, recipientPhone, order);
+      _chai2.default.request(_app2.default).get('/api/v1/orders').end(function (error, response) {
+        _chai.assert.strictEqual(response.status, 200);
+        _chai.assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+        _chai.assert.isNotEmpty(response.body.data);
         done();
       });
     });

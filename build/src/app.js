@@ -24,7 +24,6 @@ app.use(function (request, response, next) {
   return next(error);
 });
 
-// eslint-disable-next-line no-unused-vars
 app.use(function (error, request, response, next) {
   var status = error.status || 400;
   response.status(status);
