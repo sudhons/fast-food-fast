@@ -46,12 +46,12 @@ describe('App', function () {
     });
   });
 
-  describe('/GET /api/v1/questions', function () {
+  describe('/GET /api/v1/orders', function () {
     it('should GET an empty array when there are no orders', function (done) {
       _chai2.default.request(_app2.default).get('/api/v1/orders').end(function (error, response) {
         _chai.assert.strictEqual(response.status, 200);
-        _chai.assert.isArray(response.body);
         _chai.assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+        _chai.assert.isEmpty(response.body.data);
         done();
       });
     });
