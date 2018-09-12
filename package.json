@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ./api"
+    "lint": "eslint ./api",
+    "build": "babel --presets env ./api -d ./build"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,9 @@
     "express": "^4.16.3"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "eslint": "^4.9.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.7.0",
