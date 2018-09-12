@@ -19,22 +19,24 @@ h4, h5 {
   padding: 0;
 }
 
+ul {
+  list-style: none;
+}
+
 #main-header {
   background-color: #dedede;
   padding: 0.5rem 1.2rem;
-  border-bottom: solid .3rem #948b8b4d;
   display: flex;
   justify-content: space-between;
   height: 4rem;
 }
 
-#main-header a, #nav-bar a {
+#main-header a {
   text-decoration: none;
-  color: #fff;
+  color: rgb(8, 8, 126);
 }
 
 #nav-bar {
-  /* display: none; */
   display: block;
   background-color: #333;
   border-radius: 0 0 0.3rem 0.3rem;
@@ -45,10 +47,14 @@ h4, h5 {
 
 #nav-bar li {
   display: block;
-  list-style: none;
   font-size: 1.2rem;
   text-align: center;
   padding: 0.7rem 0;
+}
+
+#nav-bar a {
+  text-decoration: none;
+  color: #fff;
 }
 
 #nav-bar li:hover {
@@ -66,7 +72,6 @@ h4, h5 {
   margin: 0;
   font-size: 1.4rem;
   font-family: "Comic sans Ms";
-  text-shadow: 0rem 0rem 2rem blue;
 }
 
 #menu {
@@ -75,7 +80,7 @@ h4, h5 {
 }
 
 #menu i {
-  color: blue;
+  color: rgb(8, 8, 126);
   opacity: 0.4;
 }
 
@@ -89,7 +94,8 @@ main {
 #main {
   position: relative;
   padding-top: 3rem;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
+  min-height: 100%;
 }
 
 #main::before {
@@ -97,12 +103,13 @@ main {
   top: 0;
   content: "";
   min-height: 100%;
+  height: 100%;
   width: 100%;
-  background-image: url("/UI/img/home.jpg");
+  background-image: url("../img/home.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
+  background-attachment: scroll;
   z-index: -1;
 }
 
@@ -117,7 +124,6 @@ main {
   font-size: 1.8rem;
   text-align: center;
   color: #fff;
-  text-shadow: 0.3rem 0.3rem 0.5rem red;
 }
 
 #signup, #login {
@@ -211,7 +217,6 @@ input[type="submit"]:hover {
 #menu-bar {
   position: sticky;
   top: 0;
-  box-shadow: .3rem 0 .5rem #aaa;
   width: 0;
   height: 100vh;
   background-color: #dedede;
@@ -224,7 +229,6 @@ input[type="submit"]:hover {
   display: block;
   margin-top: 5rem;
   text-align: left;
-  list-style: none;
 }
 
 #menu-bar .menu-category-link {
@@ -239,7 +243,8 @@ input[type="submit"]:hover {
   transition: 0.5s;
 }
 
-#menu-bar .menu-category-link:hover, #menu-bar #active {
+#menu-bar .menu-category-link:hover,
+#menu-bar #active {
   color: #fff;
   background-color: blue;
   font-weight: 200;
@@ -258,9 +263,9 @@ input[type="submit"]:hover {
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
 }
 
-#meals, #drinks, #desserts,
-#previous-orders, #my-order {
+ .section-group {
   display: none;
+  min-height: 100%;
 }
 
 .show {
@@ -317,7 +322,6 @@ input[type="submit"]:hover {
   padding: 1.2rem 5.2rem;
 }
 
-
 #orders {
   flex-wrap: wrap;
   display: grid;
@@ -370,7 +374,7 @@ input[type="submit"]:hover {
 }
 
 #order-form .price,
-#order-form .total{
+#order-form .total {
   width: 5rem;
   background-color: transparent;
   border: none !important;
@@ -404,8 +408,8 @@ input[type="submit"]:hover {
   background-color: #ccc;
   color: #333;
   font-weight: bold;
-  padding: 2rem;
-  min-height: 5rem;
+  padding: 1.2rem;
+  height: 5rem;
   text-align: center;
   margin-top: -5rem;
 }
@@ -427,8 +431,128 @@ input[type="submit"]:hover {
   right: 0.7rem;
 }
 
-.fa-trash:hover {
-  opacity: 0.8;
+.fa-trash:hover,
+.status-btn:hover {
+  opacity: 0.75;
+}
+
+.order-table {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
+  min-height: 3rem;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.order-table > div {
+  padding-top: .6rem;
+}
+
+.order-table a {
+  display: block;
+  text-decoration: none;
+  color: #000;
+}
+
+ul .order-table > div:first-child {
+  background-color: #dadada;
+}
+
+ul .order-table > div:first-child:hover {
+  background-color: #4f4f4f;
+}
+
+ul .order-table > div:first-child:hover a {
+  color: #fff;
+}
+
+.order-table.head {
+  text-transform: uppercase;
+  background-color: #aaa;
+  padding: 0 .3rem;
+}
+
+.section-group {
+  box-shadow: 0 0 .5rem #4f4f4f;
+  border-bottom: solid 3rem  #aaa;
+}
+
+.section-group li {
+  margin: .1rem 0;
+}
+
+.order-detail {
+  display: flex;
+  flex-wrap: wrap;
+  height: 0;
+  transition: 0.6s;
+  background-color: #fff;
+  overflow: auto;
+  width: 100%;
+}
+
+.order-detail table {
+  border-collapse: collapse;
+}
+
+.order-detail tr:nth-child(even) {
+  background-color: #eee;
+}
+
+.order-detail th, .order-detail td {
+  padding: .6rem;
+}
+
+.order-props-val {
+  font-weight: 600;
+}
+
+.order-amount {
+  text-align: center;
+  width: 100%;
+}
+
+.order-amount thead,
+.order-amount tfoot {
+  background-color: #999;
+}
+
+.complete {
+  background-color: green;
+  color: #fff;
+}
+
+.completed {
+  background-color: #dadada;
+  color: green;
+}
+
+.declined {
+  background-color: #dadada;
+  color: red;
+}
+
+.waiting {
+  background-color: #dadada;
+  color: rgb(173, 173, 22);
+}
+
+.date {
+  background-color: #cecece;
+}
+
+.decline {
+  background-color: red;
+  color: #fff;
+}
+
+.accept, .unaccept {
+  background-color: rgb(26, 26, 87);
+}
+
+.status-btn a {
+  color: #fff;
 }
 
 @media screen and (min-width: 650px) {
@@ -452,7 +576,6 @@ input[type="submit"]:hover {
     height: 4rem !important;
     border-radius: 0;
     width: 50%;
-    border-bottom: solid .3rem #948b8b4d;
     transition: none !important;
   }
 
@@ -469,7 +592,10 @@ input[type="submit"]:hover {
     margin: 0;
     padding: 1rem;
     font-weight: 450;
-    text-shadow: 0rem 0rem 2rem blue;
+  }
+
+  #nav-bar a {
+    color: rgb(8, 8, 126);
   }
 
   #nav-bar li:first-child {
