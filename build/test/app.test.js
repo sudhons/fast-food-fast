@@ -12,18 +12,20 @@ var _app = require('../src/app');
 
 var _app2 = _interopRequireDefault(_app);
 
+var _orderQueries = require('../src/db/queries/orderQueries');
+
+var _orderQueries2 = _interopRequireDefault(_orderQueries);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import orderQueries from '../src/db/queries/orderQueries';
-
-_chai2.default.use(_chaiHttp2.default); /* eslint-env mocha */
-
+/* eslint-env mocha */
+_chai2.default.use(_chaiHttp2.default);
 
 describe('App', function () {
-  // beforeEach((done) => {
-  //   orderQueries.deleteAllOrders();
-  //   done();
-  // });
+  beforeEach(function (done) {
+    _orderQueries2.default.deleteAllOrders();
+    done();
+  });
 
   describe('/GET /', function () {
     it('should return a 404 error', function (done) {
@@ -38,24 +40,20 @@ describe('App', function () {
   describe('/GET /api/v1', function () {
     it('should return a welcome object', function (done) {
       _chai2.default.request(_app2.default).get('/api/v1').end(function (error, response) {
-        // assert.strictEqual(response.status, 200);
         _chai.assert.hasAllKeys(response.body, ['status', 'message']);
         done();
       });
     });
   });
 
-  // describe('/GET /api/v1/questions', () => {
-  //   it('should GET an empty array when there are no orders', (done) => {
-  //     chai.request(app)
-  //       .get('/api/v1/orders')
-  //       .end((error, response) => {
-  //         assert.strictEqual(response.type, 'application/json');
-  //         assert.strictEqual(response.status, 200);
-  //         assert.isArray(response.body);
-  //         assert.hasAllKeys(response.body, ['status', 'message', 'data']);
-  //         done();
-  //       });
-  //   });
-  // });
+  describe('/GET /api/v1/questions', function () {
+    it('should GET an empty array when there are no orders', function (done) {
+      _chai2.default.request(_app2.default).get('/api/v1/orders').end(function (error, response) {
+        _chai.assert.strictEqual(response.status, 200);
+        _chai.assert.isArray(response.body);
+        _chai.assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+        done();
+      });
+    });
+  });
 });
