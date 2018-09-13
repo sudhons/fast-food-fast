@@ -13,6 +13,7 @@ const recipientPhone = '09009054321';
 const recipientAddress = '32 Araomi Onike Yaba';
 const order = [{ mealId: 90, quantity: 2 }];
 
+
 describe('App', () => {
   beforeEach((done) => {
     orderQueries.deleteAllOrders();
@@ -66,4 +67,18 @@ describe('App', () => {
         });
     });
   });
+
+  describe('/POST /api/v1/orders', () => {
+    it('should not POST an order with no customer value', (done) => {
+      chai.request(app)
+        .post('/api/v1/orders')
+        .send({ recipientName, recipientAddress, recipientPhone })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+  });
+
 });
