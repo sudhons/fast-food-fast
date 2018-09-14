@@ -121,4 +121,23 @@ Validator.validateOrderId = [
 
   checkErrors,
 ];
+
+Validator.validateStatus = [
+  body('status')
+    .exists().withMessage({ status: 400, message: 'Status is required' })
+    .isString()
+    .withMessage({ status: 422, message: 'Status should be string valued' })
+    .not()
+    .isEmpty()
+    .trim()
+    .escape()
+    .withMessage({ status: 422, message: 'Status cannot be empty' })
+    .custom(value => ['accepted', 'declined', 'completed'].includes(value.toLowerCase()))
+    .trim()
+    .escape()
+    .withMessage({ status: 422, message: 'Invalid status value' }),
+
+  checkErrors,
+];
+
 export default Validator;
