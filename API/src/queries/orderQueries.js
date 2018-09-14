@@ -14,7 +14,14 @@ class Data {
     this.status = 'waiting';
   }
 
-  static createNewOrder(customer, recipientName, recipientAddr, recipientPhone, order) {
+  static createNewOrder(recipientName, recipientAddr, recipientPhone, order) {
+    const customer = 'Adeolu James';
+    const unitPrice = 200;
+    order.forEach((value) => {
+      const mealOrder = value;
+      mealOrder.unitPrice = unitPrice;
+      mealOrder.total = value.quantity * unitPrice;
+    });
     const newOrder = new Data(customer, recipientName, recipientAddr, recipientPhone, order);
     orderData.push(newOrder);
 
