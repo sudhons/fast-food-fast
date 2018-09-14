@@ -1,6 +1,7 @@
 import express from 'express';
 
 import Order from '../controllers/ordersController';
+import Validator from '../validators/validateOrders';
 
 const router = express.Router();
 
@@ -10,5 +11,7 @@ router.get('/', (request, response) => {
 });
 
 router.get('/orders', Order.getAllOrders);
+
+router.post('/orders', Validator.validatePost, Order.postOrder);
 
 export default router;
