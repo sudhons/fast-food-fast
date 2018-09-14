@@ -20,6 +20,8 @@ const orderWrongMealId = [{ mealId: '90', quantity: 2 }];
 const orderWrongQuantity1 = [{ mealId: 90, quantity: '2' }];
 const orderWrongQuantity2 = [{ mealId: 90, quantity: 0 }];
 const wrongOrderId = 39237;
+const orderStatus = 'accepted';
+const wrongStatus = 'wrong status';
 
 
 describe('App', () => {
@@ -319,6 +321,58 @@ describe('App', () => {
         .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
       chai.request(app)
         .get(`/api/v1/orders/${orderId}`)
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          done();
+        });
+    });
+  });
+
+  describe('/UPDATE /api/v1/orders/orderId', () => {
+    it('should not UPDATE an order when the orderId does not exist', (done) => {
+      orderQueries.createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .update(`/api/v1/orders/${wrongOrderId}`)
+        .send({ status: orderStatus })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 404);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not UPDATE an order status if request body contains no status', (done) => {
+      const { orderId } = orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .update(`/api/v1/orders/${orderId}`)
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not UPDATE an order with an invalid status value', (done) => {
+      const { orderId } = orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .update(`/api/v1/orders/${orderId}`)
+        .send({ status: wrongStatus })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should UPDATE an order', (done) => {
+      const { orderId } = orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .update(`/api/v1/orders/${orderId}`)
+        .send({ status: order })
         .end((error, response) => {
           assert.strictEqual(response.status, 200);
           assert.hasAllKeys(response.body, ['status', 'message', 'data']);
