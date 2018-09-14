@@ -26,6 +26,12 @@ class Order {
 
     return response.status(200).json({ status: 200, message: 'Sucessful', data });
   }
+
+  static updateOrder(request, response) {
+    const data = Data
+      .updateOrderStatus(Number(request.params.orderId), request.body.status.toLowerCase());
+    return response.status(200).json({ status: 200, message: 'update an order', data });
+  }
 }
 
 export default Order;

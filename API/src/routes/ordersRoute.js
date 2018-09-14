@@ -16,4 +16,7 @@ router.post('/orders', Validator.validatePost, Order.postOrder);
 
 router.get('/orders/:orderId', Validator.validateOrderId, Order.getOrder);
 
+router
+  .put('/orders/:orderId', Validator.validateOrderId, Validator.validateStatus, Order.updateOrder);
+
 export default router;
