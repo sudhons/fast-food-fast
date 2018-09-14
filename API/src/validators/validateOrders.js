@@ -116,9 +116,28 @@ Validator.validatePost = [
 Validator.validateOrderId = [
   param('orderId')
     .isInt().withMessage({ status: 422, message: 'Order Id must be an integer' })
-    .custom(value => Data.getAnOrder(!Number.isNaN(Number(value))))
+    .custom(value => Data.getAnOrder(Number(value)))
     .withMessage({ status: 404, message: 'Resource not Found' }),
 
   checkErrors,
 ];
+
+Validator.validateStatus = [
+  body('status')
+    .exists().withMessage({ status: 400, message: 'Status is required' })
+    .isString()
+    .withMessage({ status: 422, message: 'Status should be string valued' })
+    .not()
+    .isEmpty()
+    .trim()
+    .escape()
+    .withMessage({ status: 422, message: 'Status cannot be empty' })
+    .custom(value => ['accepted', 'declined', 'completed'].includes(value.toLowerCase()))
+    .trim()
+    .escape()
+    .withMessage({ status: 422, message: 'Invalid status value' }),
+
+  checkErrors,
+];
+
 export default Validator;
