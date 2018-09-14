@@ -20,6 +20,12 @@ class Order {
 
     return response.status(201).json({ status: 201, message: 'Successful', data });
   }
+
+  static getOrder(request, response) {
+    const data = Data.getAnOrder(Number(request.params.orderId));
+
+    return response.status(200).json({ status: 200, message: 'Sucessful', data });
+  }
 }
 
 export default Order;

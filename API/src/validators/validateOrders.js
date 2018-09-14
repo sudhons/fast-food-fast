@@ -116,7 +116,7 @@ Validator.validatePost = [
 Validator.validateOrderId = [
   param('orderId')
     .isInt().withMessage({ status: 422, message: 'Order Id must be an integer' })
-    .custom(value => Data.getAnOrder(!Number.isNaN(Number(value))))
+    .custom(value => Data.getAnOrder(Number(value)))
     .withMessage({ status: 404, message: 'Resource not Found' }),
 
   checkErrors,

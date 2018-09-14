@@ -308,7 +308,7 @@ describe('App', () => {
       chai.request(app)
         .get(`/api/v1/orders/${wrongOrderId}`)
         .end((error, response) => {
-          assert.strictEqual(response.status, 422);
+          assert.strictEqual(response.status, 404);
           assert.hasAllKeys(response.body, ['status', 'message']);
           done();
         });
@@ -320,7 +320,7 @@ describe('App', () => {
       chai.request(app)
         .get(`/api/v1/orders/${orderId}`)
         .end((error, response) => {
-          assert.strictEqual(response.status, 422);
+          assert.strictEqual(response.status, 200);
           assert.hasAllKeys(response.body, ['status', 'message', 'data']);
           done();
         });
