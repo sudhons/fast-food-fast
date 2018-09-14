@@ -1,5 +1,6 @@
-import { body, validationResult } from 'express-validator/check';
+import { param, body, validationResult } from 'express-validator/check';
 import { sanitizeBody } from 'express-validator/filter';
+import Data from '../queries/orderQueries';
 
 const checkErrors = (request, response, next) => {
   const errors = validationResult(request);
@@ -112,4 +113,12 @@ Validator.validatePost = [
   checkErrors,
 ];
 
+Validator.validateOrderId = [
+  param('orderId')
+    .isInt().withMessage({ status: 422, message: 'Order Id must be an integer' })
+    .custom(value => Data.getAnOrder(Number(value)))
+    .withMessage({ status: 404, message: 'Resource not Found' }),
+
+  checkErrors,
+];
 export default Validator;

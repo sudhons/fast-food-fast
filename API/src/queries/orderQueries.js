@@ -18,8 +18,9 @@ class Data {
     const customer = 'Adeolu James';
     const unitPrice = 200;
     order.forEach((value) => {
-      value.unitPrice = unitPrice;
-      value.total = value.quantity * unitPrice;
+      const mealOrder = value;
+      mealOrder.unitPrice = unitPrice;
+      mealOrder.total = value.quantity * unitPrice;
     });
     const newOrder = new Data(customer, recipientName, recipientAddr, recipientPhone, order);
     orderData.push(newOrder);

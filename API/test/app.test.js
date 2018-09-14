@@ -19,6 +19,7 @@ const orderNoquantity = [{ mealId: 100 }];
 const orderWrongMealId = [{ mealId: '90', quantity: 2 }];
 const orderWrongQuantity1 = [{ mealId: 90, quantity: '2' }];
 const orderWrongQuantity2 = [{ mealId: 90, quantity: 0 }];
+const wrongOrderId = 39237;
 
 
 describe('App', () => {
@@ -295,6 +296,31 @@ describe('App', () => {
         })
         .end((error, response) => {
           assert.strictEqual(response.status, 201);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          done();
+        });
+    });
+  });
+
+  describe('/GET /api/v1/orders/orderId', () => {
+    it('should not GET an order when the orderId does not exist', (done) => {
+      orderQueries.createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .get(`/api/v1/orders/${wrongOrderId}`)
+        .end((error, response) => {
+          assert.strictEqual(response.status, 404);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should GET an order with the orderId', (done) => {
+      const { orderId } = orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .get(`/api/v1/orders/${orderId}`)
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
           assert.hasAllKeys(response.body, ['status', 'message', 'data']);
           done();
         });
