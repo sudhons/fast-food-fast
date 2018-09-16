@@ -478,13 +478,15 @@ ul .order-table > div:first-child:hover a {
 }
 
 #new-orders, #accepted-orders,
-#declined-orders, #completed-orders {
+#declined-orders, #completed-orders,
+#previous-orders {
   box-shadow: 0 0 .5rem #4f4f4f;
   border-bottom: solid 3rem  #aaa;
 }
 
 #new-orders li, #accepted-orders li,
-#declined-orders li, #completed-orders li {
+#declined-orders li, #completed-orders li,
+#previous-orders li {
   margin: .1rem 0;
 }
 
