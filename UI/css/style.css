@@ -242,7 +242,8 @@ input[type="submit"]:hover {
   transition: 0.5s;
 }
 
-#menu-bar .menu-category-link:hover, #menu-bar #active {
+#menu-bar .menu-category-link:hover,
+#menu-bar #active {
   color: #fff;
   background-color: blue;
   font-weight: 200;
@@ -261,11 +262,7 @@ input[type="submit"]:hover {
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
 }
 
-#meals, #drinks, #desserts,
-#previous-orders, #my-order,
-#new-orders, #accepted-orders,
-#declined-orders, #completed-orders,
-#add-new-food {
+ .section-group {
   display: none;
   min-height: 100%;
 }
@@ -324,7 +321,6 @@ input[type="submit"]:hover {
   padding: 1.2rem 5.2rem;
 }
 
-
 #orders {
   flex-wrap: wrap;
   display: grid;
@@ -377,7 +373,7 @@ input[type="submit"]:hover {
 }
 
 #order-form .price,
-#order-form .total{
+#order-form .total {
   width: 5rem;
   background-color: transparent;
   border: none !important;
@@ -435,8 +431,7 @@ input[type="submit"]:hover {
 }
 
 .fa-trash:hover,
-.accept:hover, .decline:hover,
-.unaccept:hover, .complete:hover {
+.status-btn:hover {
   opacity: 0.75;
 }
 
@@ -477,16 +472,12 @@ ul .order-table > div:first-child:hover a {
   padding: 0 .3rem;
 }
 
-#new-orders, #accepted-orders,
-#declined-orders, #completed-orders,
-#previous-orders {
+.section-group {
   box-shadow: 0 0 .5rem #4f4f4f;
   border-bottom: solid 3rem  #aaa;
 }
 
-#new-orders li, #accepted-orders li,
-#declined-orders li, #completed-orders li,
-#previous-orders li {
+.section-group li {
   margin: .1rem 0;
 }
 
@@ -526,16 +517,31 @@ ul .order-table > div:first-child:hover a {
   background-color: #999;
 }
 
-.complete, .completed {
+.complete {
   background-color: green;
   color: #fff;
+}
+
+.completed {
+  background-color: #dadada;
+  color: green;
+}
+
+.declined {
+  background-color: #dadada;
+  color: red;
+}
+
+.waiting {
+  background-color: #dadada;
+  color: rgb(173, 173, 22);
 }
 
 .date {
   background-color: #cecece;
 }
 
-.decline, .declined {
+.decline {
   background-color: red;
   color: #fff;
 }
@@ -544,8 +550,7 @@ ul .order-table > div:first-child:hover a {
   background-color: rgb(26, 26, 87);
 }
 
-.accept a, .decline a,
-.unaccept a, .complete a {
+.status-btn a {
   color: #fff;
 }
 

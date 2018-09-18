@@ -1,7 +1,7 @@
 const navBar = document.getElementById('nav-bar');
 
-const controlNav = (e) => {
-  e.preventDefault();
+const controlNav = (event) => {
+  event.preventDefault();
   
   if(navBar.style.height === '6.4rem') {
     navBar.style.height = '0';
@@ -9,6 +9,5 @@ const controlNav = (e) => {
     navBar.style.height = '6.4rem';
   }
 };
-
 
 document.getElementById('menu').addEventListener('click', controlNav);
