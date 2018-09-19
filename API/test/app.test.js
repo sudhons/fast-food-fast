@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 
@@ -9,15 +8,15 @@ chai.use(chaiHttp);
 
 const recipientName = 'John Doe';
 const wrongRecipientName = [];
-const recipientPhone = '09009054321';
+const recipientPhone = 9009054321;
 const wrongRecipientPhone = 'phonenumber';
 const recipientAddress = '32 Araomi Onike Yaba';
 const wrongRecipientAddress = {};
 const order = [{ mealId: 90, quantity: 2 }];
 const orderNoMealId = [{ quantity: 2 }];
 const orderNoquantity = [{ mealId: 100 }];
-const orderWrongMealId = [{ mealId: '90', quantity: 2 }];
-const orderWrongQuantity1 = [{ mealId: 90, quantity: '2' }];
+const orderWrongMealId = [{ mealId: 't90', quantity: 2 }];
+const orderWrongQuantity1 = [{ mealId: 90, quantity: '0' }];
 const orderWrongQuantity2 = [{ mealId: 90, quantity: 0 }];
 const wrongOrderId = 39237;
 const orderStatus = 'accepted';
@@ -66,7 +65,8 @@ describe('App', () => {
     });
 
     it('should GET an array of orders', (done) => {
-      orderQueries.createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
       chai.request(app)
         .get('/api/v1/orders')
         .end((error, response) => {
@@ -90,11 +90,27 @@ describe('App', () => {
         });
     });
 
-    it('should not POST an order when recipient name is not a string', (done) => {
+    it('should not POST when recipient name is not a string', (done) => {
       chai.request(app)
         .post('/api/v1/orders')
         .send({
           recipientName: wrongRecipientName,
+          recipientAddress,
+          recipientPhone,
+          order,
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not POST when recipient name is an empty string', (done) => {
+      chai.request(app)
+        .post('/api/v1/orders')
+        .send({
+          recipientName: '    ',
           recipientAddress,
           recipientPhone,
           order,
@@ -117,7 +133,7 @@ describe('App', () => {
         });
     });
 
-    it('should not POST an order when recipient address is not a string', (done) => {
+    it('should not POST when recipient address is not a string', (done) => {
       chai.request(app)
         .post('/api/v1/orders')
         .send({
@@ -133,7 +149,23 @@ describe('App', () => {
         });
     });
 
-    it('should not POST an order with no recepient phone number', (done) => {
+    it('should not POST recipient address is an empty string', (done) => {
+      chai.request(app)
+        .post('/api/v1/orders')
+        .send({
+          recipientName,
+          recipientPhone,
+          recipientAddress: '    ',
+          order,
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not POST an order with no recipient phone number', (done) => {
       chai.request(app)
         .post('/api/v1/orders')
         .send({
@@ -148,21 +180,24 @@ describe('App', () => {
         });
     });
 
-    it('should not POST an order when recepient phone number  is not a number', (done) => {
-      chai.request(app)
-        .post('/api/v1/orders')
-        .send({
-          recipientName,
-          recipientPhone: wrongRecipientPhone,
-          recipientAddress,
-          order,
-        })
-        .end((error, response) => {
-          assert.strictEqual(response.status, 422);
-          assert.hasAllKeys(response.body, ['status', 'message']);
-          done();
-        });
-    });
+    it(
+      'should not POST when recipient phone number is not a number',
+      (done) => {
+        chai.request(app)
+          .post('/api/v1/orders')
+          .send({
+            recipientName,
+            recipientPhone: wrongRecipientPhone,
+            recipientAddress,
+            order,
+          })
+          .end((error, response) => {
+            assert.strictEqual(response.status, 422);
+            assert.hasAllKeys(response.body, ['status', 'message']);
+            done();
+          });
+      },
+    );
 
     it('should not POST an order with no order property', (done) => {
       chai.request(app)
@@ -191,7 +226,7 @@ describe('App', () => {
         });
     });
 
-    it('should not POST an order when the contents of order are not objects', (done) => {
+    it('should not POST when the contents of order are not objects', (done) => {
       chai.request(app)
         .post('/api/v1/orders')
         .send({
@@ -207,21 +242,24 @@ describe('App', () => {
         });
     });
 
-    it('should not POST when the contents of order do not have a mealId property', (done) => {
-      chai.request(app)
-        .post('/api/v1/orders')
-        .send({
-          recipientName,
-          recipientAddress,
-          recipientPhone,
-          order: orderNoMealId,
-        })
-        .end((error, response) => {
-          assert.strictEqual(response.status, 422);
-          assert.hasAllKeys(response.body, ['status', 'message']);
-          done();
-        });
-    });
+    it(
+      'should not POST when a content of order lacks a mealId property',
+      (done) => {
+        chai.request(app)
+          .post('/api/v1/orders')
+          .send({
+            recipientName,
+            recipientAddress,
+            recipientPhone,
+            order: orderNoMealId,
+          })
+          .end((error, response) => {
+            assert.strictEqual(response.status, 422);
+            assert.hasAllKeys(response.body, ['status', 'message']);
+            done();
+          });
+      },
+    );
 
     it('should not POST when the mealId is not a number', (done) => {
       chai.request(app)
@@ -239,21 +277,24 @@ describe('App', () => {
         });
     });
 
-    it('should not POST when the contents of order do not have a quantity property', (done) => {
-      chai.request(app)
-        .post('/api/v1/orders')
-        .send({
-          recipientName,
-          recipientAddress,
-          recipientPhone,
-          order: orderNoquantity,
-        })
-        .end((error, response) => {
-          assert.strictEqual(response.status, 422);
-          assert.hasAllKeys(response.body, ['status', 'message']);
-          done();
-        });
-    });
+    it(
+      'should not POST when a content of order lacks a quantity property',
+      (done) => {
+        chai.request(app)
+          .post('/api/v1/orders')
+          .send({
+            recipientName,
+            recipientAddress,
+            recipientPhone,
+            order: orderNoquantity,
+          })
+          .end((error, response) => {
+            assert.strictEqual(response.status, 422);
+            assert.hasAllKeys(response.body, ['status', 'message']);
+            done();
+          });
+      },
+    );
 
     it('should not POST when quantity is not a number', (done) => {
       chai.request(app)
@@ -271,7 +312,7 @@ describe('App', () => {
         });
     });
 
-    it('should not POST an order when quantity is less than one', (done) => {
+    it('should not POST when quantity is less than one', (done) => {
       chai.request(app)
         .post('/api/v1/orders')
         .send({
@@ -305,8 +346,21 @@ describe('App', () => {
   });
 
   describe('/GET /api/v1/orders/orderId', () => {
+    it('should not GET an order when the orderId is not an integer', (done) => {
+      orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .get(`/api/v1/orders/${'*23ade'}`)
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
     it('should not GET an order when the orderId does not exist', (done) => {
-      orderQueries.createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
       chai.request(app)
         .get(`/api/v1/orders/${wrongOrderId}`)
         .end((error, response) => {
@@ -329,9 +383,23 @@ describe('App', () => {
     });
   });
 
-  describe('/put /api/v1/orders/orderId', () => {
-    it('should not put an order when the orderId does not exist', (done) => {
-      orderQueries.createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+  describe('/PUT /api/v1/orders/orderId', () => {
+    it('should not UPDATE when the orderId is not an integer', (done) => {
+      orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .put(`/api/v1/orders/${'*45'}`)
+        .send({ status: orderStatus })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not UPDATE when the orderId does not exist', (done) => {
+      orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
       chai.request(app)
         .put(`/api/v1/orders/${wrongOrderId}`)
         .send({ status: orderStatus })
@@ -342,19 +410,19 @@ describe('App', () => {
         });
     });
 
-    it('should not put an order status if request body contains no status', (done) => {
+    it('should not UPDATE if request body contains no status', (done) => {
       const { orderId } = orderQueries
         .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
       chai.request(app)
         .put(`/api/v1/orders/${orderId}`)
         .end((error, response) => {
-          assert.strictEqual(response.status, 400);
+          assert.strictEqual(response.status, 422);
           assert.hasAllKeys(response.body, ['status', 'message']);
           done();
         });
     });
 
-    it('should not put an order with an invalid status value', (done) => {
+    it('should not UPDATE an order with an invalid status value', (done) => {
       const { orderId } = orderQueries
         .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
       chai.request(app)
@@ -367,12 +435,51 @@ describe('App', () => {
         });
     });
 
-    it('should put an order', (done) => {
+    it('should UPDATE an order status', (done) => {
       const { orderId } = orderQueries
         .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
       chai.request(app)
         .put(`/api/v1/orders/${orderId}`)
         .send({ status: orderStatus })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          done();
+        });
+    });
+
+    it('should UPDATE an order status with waiting', (done) => {
+      const { orderId } = orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .put(`/api/v1/orders/${orderId}`)
+        .send({ status: 'waITing' })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          done();
+        });
+    });
+
+    it('should UPDATE an order status with declined', (done) => {
+      const { orderId } = orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .put(`/api/v1/orders/${orderId}`)
+        .send({ status: 'declined' })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          done();
+        });
+    });
+
+    it('should UPDATE an order status with completed', (done) => {
+      const { orderId } = orderQueries
+        .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
+      chai.request(app)
+        .put(`/api/v1/orders/${orderId}`)
+        .send({ status: 'completED' })
         .end((error, response) => {
           assert.strictEqual(response.status, 200);
           assert.hasAllKeys(response.body, ['status', 'message', 'data']);
