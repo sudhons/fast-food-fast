@@ -1,143 +1,263 @@
-import { param, body, validationResult } from 'express-validator/check';
-import { sanitizeBody } from 'express-validator/filter';
 import Data from '../queries/orderQueries';
 
-const checkErrors = (request, response, next) => {
-  const errors = validationResult(request);
+const doesPropertyExist = property => property !== undefined;
 
-  if (!errors.isEmpty()) {
-    const { status, message } = errors.array()[0].msg;
-    const error = new Error(message);
-    error.status = status;
-    return next(error);
-  }
+const isString = property => typeof property === 'string';
 
-  return next();
+const isNotEmptyString = property => property.length > 0;
+
+const isNumber = property => typeof property === 'number';
+
+const isObject = (property) => {
+  const type = Object.prototype.toString;
+  return type.call(property) === type.call({});
 };
 
-class Validator { }
+/**
+ * Validates request object's load data
+ */
+class Validator {
+  /**
+   * @static
+   * @method validatePost
+   * @description Validates request's payload
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validatePost(request, response, next) {
+    const {
+      recipientName, recipientAddress, recipientPhone, order
+    } = request.body;
 
-Validator.validatePost = [
-  body('recipientName')
-    .exists().withMessage({ status: 422, message: 'Recipient name is required' })
-    .isString()
-    .withMessage({ status: 422, message: 'Recipient name should be a string' })
-    .not()
-    .isEmpty()
-    .trim()
-    .escape()
-    .withMessage({ status: 422, message: 'Recipient name cannot be an empty' }),
+    if (!doesPropertyExist(recipientName)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Recipient name is required'
+      });
+    }
 
-  sanitizeBody('recipientName').trim().escape(),
+    if (!isString(recipientName)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Recipient name should be a string'
+      });
+    }
 
-  body('recipientAddress')
-    .exists().withMessage({ status: 422, message: 'Recipient address is required' })
-    .isString()
-    .withMessage({ status: 422, message: 'Recipient address should be a string' })
-    .not()
-    .isEmpty()
-    .trim()
-    .escape()
-    .withMessage({ status: 422, message: 'Recipient address cannot be an empty' }),
+    if (!isNotEmptyString(recipientName.trim())) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Recipient name cannot be an empty string'
+      });
+    }
 
-  sanitizeBody('recipientAddress').trim().escape(),
+    if (!doesPropertyExist(recipientAddress)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Recipient address is required'
+      });
+    }
 
-  body('recipientPhone')
-    .exists().withMessage({ status: 422, message: 'Recipient phone number is required' })
-    .isInt()
-    .withMessage({ status: 422, message: 'Recipient phone number should be a number' }),
+    if (!isString(recipientAddress)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Recipient address should be a string'
+      });
+    }
 
-  sanitizeBody('recipientPhone').trim().escape(),
+    if (!isNotEmptyString(recipientAddress.trim())) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Recipient address cannot be an empty string'
+      });
+    }
 
-  body('order')
-    .exists().withMessage({ status: 422, message: 'Order is required' })
-    .isArray()
-    .withMessage({ status: 422, message: 'Order must be an array' })
-    .not()
-    .isEmpty()
-    .withMessage({ status: 422, message: 'Order content cannot be empty' })
-    .custom((value) => {
-      const type = Object.prototype.toString;
-      const isAllObj = value.find(order => type.call(order) !== type.call({}));
-      return isAllObj === undefined;
-    })
-    .withMessage({
-      status: 422,
-      message: 'Contents of order must be objects with properties: mealId and quantity',
-    })
-    .custom((value) => {
-      const hasPropsMealId = value.find(order => order.mealId === undefined);
-      return hasPropsMealId === undefined;
-    })
-    .withMessage({
-      status: 422,
-      message: 'contents of order must have property mealId',
-    })
-    .custom((value) => {
-      const mealIdsAreNumber = value.find(order => typeof order.mealId !== 'number');
-      return mealIdsAreNumber === undefined;
-    })
-    .withMessage({
-      status: 422,
-      message: 'mealId must be a number',
-    })
-    .custom((value) => {
-      const hasPropsQuantity = value.find(order => order.quantity === undefined);
-      return hasPropsQuantity === undefined;
-    })
-    .withMessage({
-      status: 422,
-      message: 'contents of order must have property quantity',
-    })
-    .custom((value) => {
-      const mealIdAreNumber = value
-        .find(order => (typeof order.quantity) !== 'number');
-      return mealIdAreNumber === undefined;
-    })
-    .withMessage({
-      status: 422,
-      message: 'quantity must be a number',
-    })
-    .custom((value) => {
-      const mealIdAreNumber = value
-        .find(order => order.quantity < 1);
-      return mealIdAreNumber === undefined;
-    })
-    .withMessage({
-      status: 422,
-      message: 'quantity must be greater than 0',
-    }),
+    if (!doesPropertyExist(recipientPhone)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Recipient phone number is required'
+      });
+    }
 
-  sanitizeBody('order.*').trim().escape(),
+    if (!isNumber(recipientPhone)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Recipient phone number should be a number'
+      });
+    }
 
-  checkErrors,
-];
+    if (!doesPropertyExist(order)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Order is required'
+      });
+    }
 
-Validator.validateOrderId = [
-  param('orderId')
-    .isInt().withMessage({ status: 422, message: 'Order Id must be an integer' })
-    .custom(value => Data.getAnOrder(Number(value)))
-    .withMessage({ status: 404, message: 'Resource not Found' }),
+    if (!Array.isArray(order)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Order must be an array'
+      });
+    }
 
-  checkErrors,
-];
+    if (order.length === 0) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Order content cannot be empty'
+      });
+    }
 
-Validator.validateStatus = [
-  body('status')
-    .exists().withMessage({ status: 400, message: 'Status is required' })
-    .isString()
-    .withMessage({ status: 422, message: 'Status should be string valued' })
-    .not()
-    .isEmpty()
-    .trim()
-    .escape()
-    .withMessage({ status: 422, message: 'Status cannot be empty' })
-    .custom(value => ['accepted', 'declined', 'completed'].includes(value.toLowerCase()))
-    .trim()
-    .escape()
-    .withMessage({ status: 422, message: 'Invalid status value' }),
+    const isAllObj = order.find(value => !isObject(value));
+    if (isAllObj !== undefined) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Contents of order must be objects'
+      });
+    }
 
-  checkErrors,
-];
+    const hasPropsMealId = order
+      .find(value => !doesPropertyExist(value.mealId));
+    if (hasPropsMealId !== undefined) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Contents of order must have property mealId'
+      });
+    }
+
+    const mealIdsAreNumber = order.find(value => !isNumber(value.mealId));
+    if (mealIdsAreNumber !== undefined) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'MealId must be a number'
+      });
+    }
+
+    const hasPropsQuantity = order
+      .find(value => !doesPropertyExist(value.quantity));
+    if (hasPropsQuantity !== undefined) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Contents of order must have property quantity'
+      });
+    }
+
+    const quantitiesAreNumbers = order.find(value => !isNumber(value.quantity));
+    if (quantitiesAreNumbers !== undefined) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Quantity must be a number'
+      });
+    }
+
+    const quantitiesArePositive = order.find(value => value.quantity < 1);
+    if (quantitiesArePositive !== undefined) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Quantity must be greater than 0'
+      });
+    }
+
+    return next();
+  }
+
+  /**
+   * @static
+   * @method validateOrderId
+   * @description Validates order's Id
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validateOrderId(request, response, next) {
+    const orderId = Number(request.params.orderId);
+    if (Number.isNaN(orderId)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Order Id must be an integer'
+      });
+    }
+
+    const order = Data.getAnOrder(orderId);
+    if (order === null) {
+      response.status(404);
+      return response.json({
+        status: 404,
+        message: 'Order Id must be an integer'
+      });
+    }
+
+    return next();
+  }
+
+  /**
+   * @static
+   * @method validateStatus
+   * @description Validates request's status value
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validateStatus(request, response, next) {
+    const { status } = request.body;
+
+    if (!doesPropertyExist(status)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Status is required'
+      });
+    }
+
+    if (!isString(status)) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Status should be string valued'
+      });
+    }
+
+    if (!isNotEmptyString(status.trim())) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Status cannot be empty string'
+      });
+    }
+
+    const isValidStatus = ['waiting', 'accepted', 'declined', 'completed']
+      .includes(status.trim().toLowerCase());
+
+    if (!isValidStatus) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Invalid status value'
+      });
+    }
+
+    return next();
+  }
+}
 
 export default Validator;

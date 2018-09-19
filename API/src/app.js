@@ -10,23 +10,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api/v1', orders);
 
-app.use((request, response, next) => {
-  const error = new Error('unknown url path');
-  error.status = 404;
-  return next(error);
-});
-
-// eslint-disable-next-line no-unused-vars
-app.use((error, request, response, next) => {
-  const status = error.status || 400;
-  response.status(status);
-  return response.json({ status, message: error.message });
+app.use((request, response) => {
+  response.status(404);
+  return response.json({ status: 404, message: 'unknown url path' });
 });
 
 const PORT = parseInt(process.env.PORT, 10) || 5000;
 
-if (require.main === module) {
-  app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
-}
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
 export default app;
