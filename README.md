@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/sudhons/fast-food-fast.svg?branch=feature-api-endpoints-160445750)](https://travis-ci.org/sudhons/fast-food-fast)
-[![Coverage Status](https://coveralls.io/repos/github/sudhons/fast-food-fast/badge.svg?branch=feature-api-endpoints-160445750)](https://coveralls.io/github/sudhons/fast-food-fast?branch=feature-api-endpoints-160445750)
+[![Build Status](https://travis-ci.org/sudhons/fast-food-fast.svg?branch=develop)](https://travis-ci.org/sudhons/fast-food-fast)
+[![Coverage Status](https://coveralls.io/repos/github/sudhons/fast-food-fast/badge.svg?branch=develop)](https://coveralls.io/github/sudhons/fast-food-fast?branch=develop)
 [![GitHub](https://img.shields.io/github/license/sudhons/fast-food-fast.svg)](https://github.com/sudhons/fast-food-fast/blob/develop/LICENSE.txt)
 
 

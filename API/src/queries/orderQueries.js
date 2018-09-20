@@ -90,7 +90,27 @@ class Data {
     const requiredOrder = Data.getAnOrder(orderId);
 
     requiredOrder.status = status;
-    requiredOrder[`${status}Time`] = Date.now();
+
+    if (status !== 'waiting') {
+      requiredOrder[`${status}Time`] = Date.now();
+    }
+
+    switch (status) {
+      case 'accepted':
+        requiredOrder.declinedTime = null;
+        requiredOrder.completedTime = null;
+        break;
+      case 'declined':
+        requiredOrder.acceptedTime = null;
+        requiredOrder.completedTime = null;
+        break;
+      case 'completed':
+        break;
+      default:
+        requiredOrder.acceptedTime = null;
+        requiredOrder.declinedTime = null;
+        requiredOrder.completedTime = null;
+    }
 
     return requiredOrder;
   }

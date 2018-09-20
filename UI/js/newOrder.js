@@ -1,7 +1,6 @@
 const menuItems = document.querySelectorAll('.menu-category-link');
-const closeBtn = document.getElementById('close');
-const menuBar = document.getElementById('menu-bar');
-const openBtn = document.querySelector('.fa-caret-square-down');
+
+const addItemBtns = document.querySelectorAll('.item-btn');
 
 const selectItem = (event) => {
   event.preventDefault();
@@ -17,4 +16,20 @@ const selectItem = (event) => {
   document.getElementById(targetElement).classList.add('show');
 };
 
+const addToOrder = (event) => {
+  event.preventDefault();
+  const addBtn = event.target;
+
+  if (addBtn.innerText === 'add to order') {
+    addBtn.innerText = 'added';
+    addBtn.style.opacity = 0.8;
+  } else {
+    addBtn.innerText = 'add to order';
+    addBtn.style.opacity = 1;
+  }
+};
+
 menuItems.forEach(menuItem => menuItem.addEventListener('click', selectItem));
+
+addItemBtns.forEach(btn => btn.addEventListener('click', addToOrder));
+
