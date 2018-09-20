@@ -53,8 +53,7 @@ Fast-Food-Fast is a food ordering and delivery application for a restaurant.
   <tr><th>HTTP verbs</th><th>Route Endpoints</th><th>Function</th><th>Request Payload</th></tr>
 <tr><td>GET</td><td>/api/v1/orders</td><td>Gets all orders</td><td>None</td></tr>
 <tr><td>POST</td><td>/api/v1/orders</td><td>Posts a new order</td><td>
-{
-
+	
     "recipientName": <string>,
     "recipientAddress": <string>,
     "recipientPhone": <number>,
@@ -62,14 +61,12 @@ Fast-Food-Fast is a food ordering and delivery application for a restaurant.
       {"mealId": <number>, "quantity": <number>},
       {"mealId": <number>, "quantity": <number>}
     ]
-}
+    
 </td></tr>
 <tr><td>GET</td><td>/api/v1/orders/:orderId</td><td>Gets an order</td><td>None</td></tr>
 <tr><td>PUT</td><td>/api/v1/orders/:orderId </td><td> Updates an order's status</td><td>
-{
 
 	"status": "accepted"  
-}
 
 Accepted values of status: `accepted`, `waiting`, `completed`, `declined`</td></tr>
 </table>
