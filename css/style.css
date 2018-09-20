@@ -323,7 +323,6 @@ input[type="submit"]:hover {
 }
 
 #orders {
-  flex-wrap: wrap;
   display: grid;
   grid-gap: 0.5rem;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
@@ -341,6 +340,7 @@ input[type="submit"]:hover {
   display: flex;
   flex-wrap: wrap;
   text-align: left;
+  max-width: 18rem;
 }
 
 .order-items img {
@@ -351,10 +351,15 @@ input[type="submit"]:hover {
   display: block;
 }
 
-.order-props {
+.order-props, .my-order-props {
   min-height: 2rem;
   margin: 1rem;
   margin-right: 0;
+}
+
+.my-order-props > div {
+  display: inline;
+  font-weight: 500;
 }
 
 #order-form input[type="number"] {
@@ -436,49 +441,55 @@ input[type="submit"]:hover {
   opacity: 0.75;
 }
 
-.order-table {
+.order-table, .head {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   text-align: center;
-  min-height: 3rem;
+  min-height: 2.8rem;
   font-weight: 500;
   font-size: 1.1rem;
-}
-
-.order-table > div {
-  padding-top: .6rem;
 }
 
 .order-table a {
   display: block;
   text-decoration: none;
+  padding: 0.7rem;
   color: #000;
 }
 
-ul .order-table > div:first-child {
+.order-table > div:nth-child(even) {
   background-color: #dadada;
 }
 
-ul .order-table > div:first-child:hover {
-  background-color: #4f4f4f;
+.order-table > div:nth-child(odd) {
+  background-color: #cecece;
 }
 
-ul .order-table > div:first-child:hover a {
+.order-id {
+  height: 100%;
+  width: 100%;
+}
+
+.show-order:hover {
+  background-color: #4f4f4f !important;
+}
+
+.show-order:hover a {
   color: #fff;
 }
 
-.order-table.head {
+.head {
   text-transform: uppercase;
   background-color: #aaa;
-  padding: 0 .3rem;
+  padding: .6rem;
 }
 
-.section-group {
+.section-orders {
   box-shadow: 0 0 .5rem #4f4f4f;
   border-bottom: solid 3rem  #aaa;
 }
 
-.section-group li {
+.section-orders li {
   margin: .1rem 0;
 }
 
@@ -518,41 +529,51 @@ ul .order-table > div:first-child:hover a {
   background-color: #999;
 }
 
-.complete {
+.accept,.unaccept,
+.complete, .decline {
+  padding: .2rem;
+}
+
+.complete > a {
   background-color: green;
-  color: #fff;
 }
 
 .completed {
-  background-color: #dadada;
   color: green;
+  padding: 0.6rem;
 }
 
 .declined {
-  background-color: #dadada;
   color: red;
+  padding: 0.6rem;
 }
 
 .waiting {
   background-color: #dadada;
   color: rgb(173, 173, 22);
+  padding: 0.6rem;
 }
 
 .date {
   background-color: #cecece;
+  padding: 0.6rem;
 }
 
-.decline {
+.decline > a {
   background-color: red;
-  color: #fff;
 }
 
-.accept, .unaccept {
+.accept > a, .unaccept > a {
   background-color: rgb(26, 26, 87);
 }
 
-.status-btn a {
-  color: #fff;
+.status-btn {
+  display: inline-block !important;
+  font-size: 1rem;
+  padding: .5rem !important;
+  border-radius: .3rem;
+  color: #fff !important;
+  min-width: 6rem;
 }
 
 @media screen and (min-width: 650px) {

@@ -1,3 +1,7 @@
+const closeBtn = document.getElementById('close');
+const menuBar = document.getElementById('menu-bar');
+const openBtn = document.querySelector('.fa-caret-square-down');
+
 const orderDetail = (event) => {
   event.preventDefault();
   const orderDetailSection = event
