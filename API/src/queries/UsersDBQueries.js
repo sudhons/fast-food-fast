@@ -59,4 +59,3 @@ class UsersDBQueries {
 }
 
 export default UsersDBQueries;
-

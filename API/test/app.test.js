@@ -1,5 +1,6 @@
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
+import bcrypt from 'bcryptjs';
 
 import app from '../src/app';
 import orderQueries from '../src/queries/orderQueries';
@@ -10,7 +11,10 @@ chai.use(chaiHttp);
 const firstName = 'Sunday';
 const lastName = 'Sunday';
 const email = 'sunday@ymail.com';
+const wrongEmail = 'ade@gmail.com';
 const password = 'Sunday12';
+const hashedPassword = bcrypt.hashSync('Sunday12', 10);
+const wrongPassword = 'asdassd';
 const emptyPassword = ' ';
 
 const recipientName = 'John Doe';
@@ -96,7 +100,7 @@ describe('App', () => {
     });
 
     it('should not signup if the email has already been used', (done) => {
-      UsersDBQueries.createUser(firstName, lastName, email, password)
+      UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
         .then(() => {
           chai.request(app)
             .post('/api/v1/auth/signup')
@@ -127,6 +131,94 @@ describe('App', () => {
           assert.strictEqual(response.status, 201);
           assert.hasAllKeys(response.body, ['status', 'message', 'data']);
           done();
+        });
+    });
+  });
+
+  describe('/POST /api/v1/auth/login', () => {
+    it('should not login if payload has additional properties', (done) => {
+      UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
+        .then(() => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email,
+              password,
+              additional: ''
+            })
+            .end((error, response) => {
+              assert.strictEqual(response.status, 422);
+              assert.hasAllKeys(response.body, ['status', 'message']);
+              done();
+            });
+        });
+    });
+
+    it('should not login if any required input is invalid', (done) => {
+      UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
+        .then(() => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email,
+              password: emptyPassword
+            })
+            .end((error, response) => {
+              assert.strictEqual(response.status, 422);
+              assert.hasAllKeys(response.body, ['status', 'message']);
+              done();
+            });
+        });
+    });
+
+    it('should not login with wrong email', (done) => {
+      UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
+        .then(() => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email: wrongEmail,
+              password
+            })
+            .end((error, response) => {
+              assert.strictEqual(response.status, 401);
+              assert.hasAllKeys(response.body, ['status', 'message']);
+              done();
+            });
+        });
+    });
+
+    it('should not login with wrong password', (done) => {
+      UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
+        .then(() => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email,
+              password: wrongPassword
+            })
+            .end((error, response) => {
+              assert.strictEqual(response.status, 401);
+              assert.hasAllKeys(response.body, ['status', 'message']);
+              done();
+            });
+        });
+    });
+
+    it('should login', (done) => {
+      UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
+        .then(() => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email,
+              password
+            })
+            .end((error, response) => {
+              assert.strictEqual(response.status, 200);
+              assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+              done();
+            });
         });
     });
   });
