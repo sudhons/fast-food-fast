@@ -18,6 +18,11 @@ const hashedPassword = bcrypt.hashSync('Sunday12', 10);
 const wrongPassword = 'asdassd';
 const emptyPassword = ' ';
 
+const mealTitle = 'rice';
+const mealPrice = 500;
+const mealCategory = 'meal';
+const mealImage = 'justimage';
+
 const recipientName = 'John Doe';
 const wrongRecipientName = [];
 const recipientPhone = 9009054321;
@@ -247,6 +252,46 @@ describe('App', () => {
           assert.hasAllKeys(response.body, ['status', 'message', 'data']);
           assert.isEmpty(response.body.data);
           done();
+        });
+    });
+  });
+
+  describe('/GET /api/v1/menu/:menuId', () => {
+    beforeEach((done) => {
+      MenuDBQueries.deleteAllMeals();
+      done();
+    });
+
+    it('should not GET menu item when id is not an integer', (done) => {
+      chai.request(app)
+        .get('/api/v1/menu/4fdsd')
+        .end((error, response) => {
+          assert.strictEqual(response.status, 400);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not GET menu item when menu id does not exist', (done) => {
+      chai.request(app)
+        .get('/api/v1/menu/1000')
+        .end((error, response) => {
+          assert.strictEqual(response.status, 404);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should GET menu item', (done) => {
+      MenuDBQueries.createMeal(mealTitle, mealPrice, mealCategory, mealImage)
+        .then((menu) => {
+          chai.request(app)
+            .get(`/api/v1/menu/${menu.menu_id}`)
+            .end((error, response) => {
+              assert.strictEqual(response.status, 200);
+              assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+              done();
+            });
         });
     });
   });
