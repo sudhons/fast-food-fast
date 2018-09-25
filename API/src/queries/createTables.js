@@ -15,6 +15,12 @@ const query = `
     WHEN duplicate_object THEN null;
   END $$;
 
+  DO $$ BEGIN
+    CREATE TYPE category AS ENUM('meal', 'drink', 'dessert');
+  EXCEPTION
+    WHEN duplicate_object THEN null;
+  END $$;
+
   CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY NOT NULL,
     user_role role NOT NULL DEFAULT 'customer',
@@ -34,9 +40,9 @@ const query = `
   CREATE TABLE IF NOT EXISTS menu (
     menu_id SERIAL PRIMARY KEY NOT NULL,
     title VARCHAR(50) NOT NULL UNIQUE,
-    price NUMERIC NOT NULL,
+    price DECIMAL NOT NULL,
     image TEXT NOT NULL,
-    category VARCHAR(50) NOT NULL
+    menu_category category NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS sales (
@@ -45,8 +51,8 @@ const query = `
     quantity INTEGER NOT NULL,
     sales_status status NOT NULL DEFAULT 'new',
     ordered_time TIMESTAMP NOT NULL DEFAULT NOW(),
-    unit_price NUMERIC NOT NULL,
-    total NUMERIC NOT NULL
+    unit_price DECIMAL NOT NULL,
+    total DECIMAL NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS orders (
@@ -55,7 +61,7 @@ const query = `
     recipient_name VARCHAR(100) NOT NULL,
     recipient_address VARCHAR(200) NOT NULL,
     recipient_phone INTEGER NOT NULL,
-    total_amount NUMERIC NOT NULL,
+    total_amount DECIMAL NOT NULL,
     order_status status DEFAULT 'new',
     ordered_time TIMESTAMP NOT NULL DEFAULT NOW(),
     accepted_time TIMESTAMP DEFAULT NULL,

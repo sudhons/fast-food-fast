@@ -6,12 +6,8 @@ import {
   isAlphaNumeric
 } from './HelperValidators';
 
-// const doesPropertyExist = property => property !== undefined;
-
-// const isString = property => typeof property === 'string';
-
 /**
- * Performs GET, POST operations on users
+ * Validate signup and signin
  */
 class UsersValidation {
   /**
@@ -114,6 +110,24 @@ class UsersValidation {
     request.body.password = password;
 
     next();
+  }
+
+  /**
+   * @static
+   * @method validateAdmin
+   * @description Validates that it's an admin
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validateAdmin(request, response, next) {
+    if (request.userRole === 'admin') {
+      return next();
+    }
+
+    response.status(401);
+    return response.json({ status: 401, message: 'Not authorized' });
   }
 }
 

@@ -15,8 +15,8 @@ class MenuDBQueries {
    * @returns {object} the new meal
    */
   static createMeal(title, price, category, image) {
-    const query = `INSERT INTO menu (title, price, category, image)
-    VALUES ('${title}', '${price}', '${category}', '${image}')
+    const query = `INSERT INTO menu (title, price, menu_category, image)
+    VALUES ('${title}', ${price}, '${category}', '${image}')
     RETURNING *`;
 
     return dbConnect.query(query).then(data => data.rows[0]);
@@ -42,7 +42,7 @@ class MenuDBQueries {
    * @returns {object} a meal or null if meal id does not exist
    */
   static getMealById(mealId) {
-    const query = `SELECT * FROM menu WHERE menu_id='${mealId}'`;
+    const query = `SELECT * FROM menu WHERE menu_id=${mealId}`;
 
     return dbConnect.query(query).then(data => data.rows[0]);
   }
