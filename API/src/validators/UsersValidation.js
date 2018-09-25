@@ -1,14 +1,14 @@
-const doesPropertyExist = property => property !== undefined;
+import {
+  doesPropertyExist,
+  isString,
+  isLetters,
+  isEmail,
+  isAlphaNumeric
+} from './HelperValidators';
 
-const isString = property => typeof property === 'string';
+// const doesPropertyExist = property => property !== undefined;
 
-const isLetters = property => /^[A-Za-z]+$/.test(property);
-
-const isEmail = property => /^\w+@\w+\.\w+$/.test(property);
-
-// passord must be alphanumeric
-const isValidPassword = property => /^\w+$/.test(property);
-
+// const isString = property => typeof property === 'string';
 
 /**
  * Performs GET, POST operations on users
@@ -51,7 +51,7 @@ class UsersValidation {
     );
     password = (
       doesPropertyExist(password) && isString(password)
-      && isValidPassword(password.trim()) && password.trim()
+      && isAlphaNumeric(password.trim()) && password.trim()
     );
 
     if (!firstName || !lastName || !email || !password) {
@@ -98,7 +98,7 @@ class UsersValidation {
     );
     password = (
       doesPropertyExist(password) && isString(password)
-      && isValidPassword(password.trim()) && password.trim()
+      && isAlphaNumeric(password.trim()) && password.trim()
     );
 
     if (!email || !password) {

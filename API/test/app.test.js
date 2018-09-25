@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import app from '../src/app';
 import orderQueries from '../src/queries/orderQueries';
 import UsersDBQueries from '../src/queries/UsersDBQueries';
+import MenuDBQueries from '../src/queries/MenuDBQueries';
 
 chai.use(chaiHttp);
 
@@ -16,6 +17,11 @@ const password = 'Sunday12';
 const hashedPassword = bcrypt.hashSync('Sunday12', 10);
 const wrongPassword = 'asdassd';
 const emptyPassword = ' ';
+
+const mealTitle = 'rice';
+const mealPrice = 500;
+const mealCategory = 'meal';
+const mealImage = 'justimage';
 
 const recipientName = 'John Doe';
 const wrongRecipientName = [];
@@ -37,7 +43,6 @@ const wrongStatus = 'wrong status';
 describe('App', () => {
   beforeEach((done) => {
     orderQueries.deleteAllOrders();
-    UsersDBQueries.deleteAllUsers();
     done();
   });
 
@@ -66,6 +71,11 @@ describe('App', () => {
   });
 
   describe('/POST /api/v1/auth/signup', () => {
+    beforeEach((done) => {
+      UsersDBQueries.deleteAllUsers();
+      done();
+    });
+
     it('should not signup if payload has additional properties', (done) => {
       chai.request(app)
         .post('/api/v1/auth/signup')
@@ -136,6 +146,11 @@ describe('App', () => {
   });
 
   describe('/POST /api/v1/auth/login', () => {
+    beforeEach((done) => {
+      UsersDBQueries.deleteAllUsers();
+      done();
+    });
+
     it('should not login if payload has additional properties', (done) => {
       UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
         .then(() => {
@@ -214,6 +229,64 @@ describe('App', () => {
               email,
               password
             })
+            .end((error, response) => {
+              assert.strictEqual(response.status, 200);
+              assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+              done();
+            });
+        });
+    });
+  });
+
+  describe('/GET /api/v1/menu', () => {
+    beforeEach((done) => {
+      MenuDBQueries.deleteAllMeals();
+      done();
+    });
+
+    it('should GET an empty array menu', (done) => {
+      chai.request(app)
+        .get('/api/v1/menu')
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          assert.isEmpty(response.body.data);
+          done();
+        });
+    });
+  });
+
+  describe('/GET /api/v1/menu/:menuId', () => {
+    beforeEach((done) => {
+      MenuDBQueries.deleteAllMeals();
+      done();
+    });
+
+    it('should not GET menu item when id is not an integer', (done) => {
+      chai.request(app)
+        .get('/api/v1/menu/4fdsd')
+        .end((error, response) => {
+          assert.strictEqual(response.status, 400);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not GET menu item when menu id does not exist', (done) => {
+      chai.request(app)
+        .get('/api/v1/menu/1000')
+        .end((error, response) => {
+          assert.strictEqual(response.status, 404);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should GET menu item', (done) => {
+      MenuDBQueries.createMeal(mealTitle, mealPrice, mealCategory, mealImage)
+        .then((menu) => {
+          chai.request(app)
+            .get(`/api/v1/menu/${menu.menu_id}`)
             .end((error, response) => {
               assert.strictEqual(response.status, 200);
               assert.hasAllKeys(response.body, ['status', 'message', 'data']);
