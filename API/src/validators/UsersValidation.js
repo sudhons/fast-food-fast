@@ -1,17 +1,13 @@
-const doesPropertyExist = property => property !== undefined;
-
-const isString = property => typeof property === 'string';
-
-const isLetters = property => /^[A-Za-z]+$/.test(property);
-
-const isEmail = property => /^\w+@\w+\.\w+$/.test(property);
-
-// passord must be alphanumeric
-const isValidPassword = property => /^\w+$/.test(property);
-
+import {
+  doesPropertyExist,
+  isString,
+  isLetters,
+  isEmail,
+  isAlphaNumeric
+} from './HelperValidators';
 
 /**
- * Performs GET, POST operations on users
+ * Validate signup and signin
  */
 class UsersValidation {
   /**
@@ -51,7 +47,7 @@ class UsersValidation {
     );
     password = (
       doesPropertyExist(password) && isString(password)
-      && isValidPassword(password.trim()) && password.trim()
+      && isAlphaNumeric(password.trim()) && password.trim()
     );
 
     if (!firstName || !lastName || !email || !password) {
@@ -98,7 +94,7 @@ class UsersValidation {
     );
     password = (
       doesPropertyExist(password) && isString(password)
-      && isValidPassword(password.trim()) && password.trim()
+      && isAlphaNumeric(password.trim()) && password.trim()
     );
 
     if (!email || !password) {
@@ -114,6 +110,24 @@ class UsersValidation {
     request.body.password = password;
 
     next();
+  }
+
+  /**
+   * @static
+   * @method validateAdmin
+   * @description Validates that it's an admin
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validateAdmin(request, response, next) {
+    if (request.userRole === 'admin') {
+      return next();
+    }
+
+    response.status(401);
+    return response.json({ status: 401, message: 'Not authorized' });
   }
 }
 

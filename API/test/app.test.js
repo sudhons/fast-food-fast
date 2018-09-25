@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import app from '../src/app';
 import orderQueries from '../src/queries/orderQueries';
 import UsersDBQueries from '../src/queries/UsersDBQueries';
+import MenuDBQueries from '../src/queries/MenuDBQueries';
 
 chai.use(chaiHttp);
 
@@ -13,9 +14,18 @@ const lastName = 'Sunday';
 const email = 'sunday@ymail.com';
 const wrongEmail = 'ade@gmail.com';
 const password = 'Sunday12';
+const adminEmail = 'fun@gamil.com';
 const hashedPassword = bcrypt.hashSync('Sunday12', 10);
 const wrongPassword = 'asdassd';
 const emptyPassword = ' ';
+
+const mealTitle = 'rice';
+const mealPrice = 500;
+const mealCategory = 'meal';
+const mealImage = 'justimage';
+
+let adminToken;
+let customerToken;
 
 const recipientName = 'John Doe';
 const wrongRecipientName = [];
@@ -33,14 +43,7 @@ const wrongOrderId = 39237;
 const orderStatus = 'accepted';
 const wrongStatus = 'wrong status';
 
-
 describe('App', () => {
-  beforeEach((done) => {
-    orderQueries.deleteAllOrders();
-    UsersDBQueries.deleteAllUsers();
-    done();
-  });
-
   describe('/GET /', () => {
     it('should return a 404 error', (done) => {
       chai.request(app)
@@ -66,6 +69,11 @@ describe('App', () => {
   });
 
   describe('/POST /api/v1/auth/signup', () => {
+    beforeEach((done) => {
+      UsersDBQueries.deleteAllUsers();
+      done();
+    });
+
     it('should not signup if payload has additional properties', (done) => {
       chai.request(app)
         .post('/api/v1/auth/signup')
@@ -136,6 +144,11 @@ describe('App', () => {
   });
 
   describe('/POST /api/v1/auth/login', () => {
+    beforeEach((done) => {
+      UsersDBQueries.deleteAllUsers();
+      done();
+    });
+
     it('should not login if payload has additional properties', (done) => {
       UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
         .then(() => {
@@ -205,7 +218,7 @@ describe('App', () => {
         });
     });
 
-    it('should login', (done) => {
+    it('should login a customer', (done) => {
       UsersDBQueries.createUser(firstName, lastName, email, hashedPassword)
         .then(() => {
           chai.request(app)
@@ -217,6 +230,220 @@ describe('App', () => {
             .end((error, response) => {
               assert.strictEqual(response.status, 200);
               assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+              customerToken = response.body.data.token;
+              done();
+            });
+        });
+    });
+
+    it('should login an admin', (done) => {
+      UsersDBQueries
+        .createAdmin(firstName, lastName, adminEmail, hashedPassword)
+        .then(() => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email: adminEmail,
+              password
+            })
+            .end((error, response) => {
+              assert.strictEqual(response.status, 200);
+              assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+              adminToken = response.body.data.token;
+              done();
+            });
+        });
+    });
+  });
+
+  describe('/GET /api/v1/menu', () => {
+    it('should GET an array menu', (done) => {
+      chai.request(app)
+        .get('/api/v1/menu')
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          assert.isArray(response.body.data);
+          done();
+        });
+    });
+  });
+
+  describe('/POST /api/v1/menu', () => {
+    beforeEach((done) => {
+      MenuDBQueries.deleteAllMeals();
+      done();
+    });
+
+    it('should not POST without token', (done) => {
+      chai.request(app)
+        .post('/api/v1/menu')
+        .send({
+          title: mealTitle,
+          price: mealPrice,
+          category: mealCategory,
+          image: mealImage
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 401);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          assert.strictEqual(response.body.message, 'Token not supplied');
+          done();
+        });
+    });
+
+    it('should not POST with an invalid token', (done) => {
+      chai.request(app)
+        .post('/api/v1/menu')
+        .set('x-access-token', 'dadajh')
+        .send({
+          title: mealTitle,
+          price: mealPrice,
+          category: mealCategory,
+          image: mealImage
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 401);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          assert.strictEqual(response.body.message, 'Invalid token');
+          done();
+        });
+    });
+
+    it('should not POST if not admin', (done) => {
+      chai.request(app)
+        .post('/api/v1/menu')
+        .set('x-access-token', customerToken)
+        .send({
+          title: mealTitle,
+          price: mealPrice,
+          category: mealCategory,
+          image: mealImage
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 401);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          assert.strictEqual(response.body.message, 'Not authorized');
+          done();
+        });
+    });
+
+    it('should not POST if there are more inputs than required', (done) => {
+      chai.request(app)
+        .post('/api/v1/menu')
+        .set('x-access-token', adminToken)
+        .send({
+          title: mealTitle,
+          price: mealPrice,
+          category: mealCategory,
+          image: mealImage,
+          moreProps: 'adad'
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          assert.strictEqual(
+            response.body.message,
+            'Unsuccessful. Payload contains additional properties'
+          );
+          done();
+        });
+    });
+
+    it('should not POST if any required value is missing', (done) => {
+      chai.request(app)
+        .post('/api/v1/menu')
+        .set('x-access-token', adminToken)
+        .send({
+          title: mealTitle,
+          price: mealPrice,
+          category: mealCategory,
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          assert.strictEqual(
+            response.body.message,
+            'Unsuccessful. Ensure required inputs are supplied and correct'
+          );
+          done();
+        });
+    });
+
+    it('should not POST if meal title already exist', (done) => {
+      MenuDBQueries.createMeal(mealTitle, mealPrice, mealCategory, mealImage);
+      chai.request(app)
+        .post('/api/v1/menu')
+        .set('x-access-token', adminToken)
+        .send({
+          title: mealTitle,
+          price: mealPrice,
+          category: mealCategory,
+          image: mealImage
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          assert.strictEqual(
+            response.body.message,
+            'Meal with the title already exist'
+          );
+          done();
+        });
+    });
+
+    it('should POST a new menu item', (done) => {
+      chai.request(app)
+        .post('/api/v1/menu')
+        .set('x-access-token', adminToken)
+        .send({
+          title: mealTitle,
+          price: mealPrice,
+          category: mealCategory,
+          image: mealImage
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 201);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          done();
+        });
+    });
+  });
+
+  describe('/GET /api/v1/menu/:menuId', () => {
+    beforeEach((done) => {
+      MenuDBQueries.deleteAllMeals();
+      done();
+    });
+
+    it('should not GET menu item when id is not an integer', (done) => {
+      chai.request(app)
+        .get('/api/v1/menu/4fdsd')
+        .end((error, response) => {
+          assert.strictEqual(response.status, 400);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not GET menu item when menu id does not exist', (done) => {
+      chai.request(app)
+        .get('/api/v1/menu/1000')
+        .end((error, response) => {
+          assert.strictEqual(response.status, 404);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should GET menu item', (done) => {
+      MenuDBQueries.createMeal(mealTitle, mealPrice, mealCategory, mealImage)
+        .then((menu) => {
+          chai.request(app)
+            .get(`/api/v1/menu/${menu.menu_id}`)
+            .end((error, response) => {
+              assert.strictEqual(response.status, 200);
+              assert.hasAllKeys(response.body, ['status', 'message', 'data']);
               done();
             });
         });
@@ -224,6 +451,11 @@ describe('App', () => {
   });
 
   describe('/GET /api/v1/orders', () => {
+    beforeEach((done) => {
+      orderQueries.deleteAllOrders();
+      done();
+    });
+
     it('should GET an empty array when there are no orders', (done) => {
       chai.request(app)
         .get('/api/v1/orders')
@@ -250,6 +482,11 @@ describe('App', () => {
   });
 
   describe('/POST /api/v1/orders', () => {
+    beforeEach((done) => {
+      orderQueries.deleteAllOrders();
+      done();
+    });
+
     it('should not POST an order with no recipient name', (done) => {
       chai.request(app)
         .post('/api/v1/orders')
@@ -517,6 +754,11 @@ describe('App', () => {
   });
 
   describe('/GET /api/v1/orders/orderId', () => {
+    beforeEach((done) => {
+      orderQueries.deleteAllOrders();
+      done();
+    });
+
     it('should not GET an order when the orderId is not an integer', (done) => {
       orderQueries
         .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
@@ -555,6 +797,11 @@ describe('App', () => {
   });
 
   describe('/PUT /api/v1/orders/orderId', () => {
+    beforeEach((done) => {
+      orderQueries.deleteAllOrders();
+      done();
+    });
+
     it('should not UPDATE when the orderId is not an integer', (done) => {
       orderQueries
         .createNewOrder(recipientName, recipientAddress, recipientPhone, order);
