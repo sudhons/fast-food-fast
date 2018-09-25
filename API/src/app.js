@@ -2,6 +2,9 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 import orders from './routes/ordersRoute';
+import createTables from './queries/createTables';
+
+createTables();
 
 const app = express();
 
@@ -17,6 +20,8 @@ app.use((request, response) => {
 
 const PORT = parseInt(process.env.PORT, 10) || 5000;
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
 
 export default app;
