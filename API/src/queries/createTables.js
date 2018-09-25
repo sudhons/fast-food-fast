@@ -33,9 +33,10 @@ const query = `
 
   CREATE TABLE IF NOT EXISTS menu (
     menu_id SERIAL PRIMARY KEY NOT NULL,
-    title VARCHAR(50) NOT NULL,
+    title VARCHAR(50) NOT NULL UNIQUE,
     price NUMERIC NOT NULL,
-    image TEXT NOT NULL
+    image TEXT NOT NULL,
+    category VARCHAR(50) NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS sales (
