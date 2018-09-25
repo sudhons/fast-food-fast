@@ -3,8 +3,15 @@ import chaiHttp from 'chai-http';
 
 import app from '../src/app';
 import orderQueries from '../src/queries/orderQueries';
+import UsersDBQueries from '../src/queries/UsersDBQueries';
 
 chai.use(chaiHttp);
+
+const firstName = 'Sunday';
+const lastName = 'Sunday';
+const email = 'sunday@ymail.com';
+const password = 'Sunday12';
+const emptyPassword = ' ';
 
 const recipientName = 'John Doe';
 const wrongRecipientName = [];
@@ -26,6 +33,7 @@ const wrongStatus = 'wrong status';
 describe('App', () => {
   beforeEach((done) => {
     orderQueries.deleteAllOrders();
+    UsersDBQueries.deleteAllUsers();
     done();
   });
 
@@ -46,7 +54,78 @@ describe('App', () => {
       chai.request(app)
         .get('/api/v1')
         .end((error, response) => {
+          assert.strictEqual(response.status, 200);
           assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+  });
+
+  describe('/POST /api/v1/auth/signup', () => {
+    it('should not signup if payload has additional properties', (done) => {
+      chai.request(app)
+        .post('/api/v1/auth/signup')
+        .send({
+          firstName,
+          lastName,
+          email,
+          password,
+          additional: ''
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not signup if any required input is invalid', (done) => {
+      chai.request(app)
+        .post('/api/v1/auth/signup')
+        .send({
+          firstName,
+          lastName,
+          email,
+          password: emptyPassword
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 422);
+          assert.hasAllKeys(response.body, ['status', 'message']);
+          done();
+        });
+    });
+
+    it('should not signup if the email has already been used', (done) => {
+      UsersDBQueries.createUser(firstName, lastName, email, password)
+        .then(() => {
+          chai.request(app)
+            .post('/api/v1/auth/signup')
+            .send({
+              firstName,
+              lastName,
+              email,
+              password
+            })
+            .end((error, response) => {
+              assert.strictEqual(response.status, 422);
+              assert.hasAllKeys(response.body, ['status', 'message']);
+              done();
+            });
+        });
+    });
+
+    it('should signup', (done) => {
+      chai.request(app)
+        .post('/api/v1/auth/signup')
+        .send({
+          firstName,
+          lastName,
+          email,
+          password
+        })
+        .end((error, response) => {
+          assert.strictEqual(response.status, 201);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
           done();
         });
     });

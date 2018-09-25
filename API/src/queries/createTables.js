@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 import dbConnect from '../config/dbConnect';
 
 const query = `
@@ -8,7 +10,7 @@ const query = `
   END $$;
   
   DO $$ BEGIN
-    CREATE TYPE status AS ENUM('new', 'processing', 'cancelled', 'complete');
+    CREATE TYPE status AS ENUM('new', 'processing', 'cancelled', 'completed');
   EXCEPTION
     WHEN duplicate_object THEN null;
   END $$;
@@ -21,6 +23,13 @@ const query = `
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL
   );
+
+  INSERT INTO users(first_name, last_name, email, password, user_role)
+    VALUES(
+      'Oluwaseun', 'Sunday', 'sudhons@yahoo.com',
+      '${bcrypt.hashSync('sudhons', 10)}', 'admin'
+    )
+    ON CONFLICT (email) DO NOTHING;
 
   CREATE TABLE IF NOT EXISTS menu (
     menu_id SERIAL PRIMARY KEY NOT NULL,
