@@ -24,6 +24,25 @@ class UsersDBQueries {
 
   /**
    * @static
+   * @method createAdmin
+   * @description creates an admin
+   * @param {string} firstName - admin's first name
+   * @param {string} lastName - admin's last name
+   * @param {string} email - admin's email
+   * @param {string} password - admin's password
+   * @returns {object} the new admin
+   */
+  static createAdmin(firstName, lastName, email, password) {
+    const query = `INSERT INTO users
+    (first_name, last_name, email, password, user_role)
+    VALUES ('${firstName}', '${lastName}', '${email}', '${password}', 'admin')
+    RETURNING user_id, user_role, email`;
+
+    return dbConnect.query(query).then(resultData => resultData.rows[0]);
+  }
+
+  /**
+   * @static
    * @method getUserByEmail
    * @description Fetches a user
    * @param {string} email - the user's email
