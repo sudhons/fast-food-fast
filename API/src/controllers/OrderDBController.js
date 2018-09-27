@@ -117,7 +117,7 @@ class OrderDBController {
       })
       .catch(() => {
         response.status(404);
-        return response.json({ status: 404, message: 'Order not Found' });
+        return response.json({ status: 404, message: 'Unsuccessful. Order not Found' });
       });
   }
 
@@ -185,7 +185,6 @@ class OrderDBController {
     };
 
     OrderDBQueries.getOrdersByUserId(userId)
-      .then(result => (!result ? Promise.reject() : Promise.resolve(result)))
       .then((result) => {
         for (let count = 0; count < result.length; count += 1) {
           ((counter) => {
@@ -209,10 +208,32 @@ class OrderDBController {
               });
           })(count);
         }
-      })
+      });
+  }
+
+  /**
+   * @static
+   * @method updateOrderStatus
+   * @description Uptates an order status
+   * @param {object} request - HTTP Request object
+   * @param {object} response - HTTP Response object
+   * @returns {object} status, message and order data
+   */
+  static updateOrderStatus(request, response) {
+    const { status } = request.body;
+    const orderId = Number(request.params.orderId);
+
+    OrderDBQueries.updateAnOrderById(orderId, status)
+      .then(result => (!result ? Promise.reject() : Promise.resolve(result)))
+      .then(() => SalesDBQueries.updateSalesByOrderId(orderId, status)
+        .then(() => {
+          response.status(200);
+          return response
+            .json({ status: 200, message: 'Successful. Status updated' });
+        }))
       .catch(() => {
         response.status(404);
-        return response.json({ status: 404, message: 'User does not exist' });
+        return response.json({ status: 404, message: 'Unsuccessful. Order not Found' });
       });
   }
 }

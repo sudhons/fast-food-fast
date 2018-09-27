@@ -24,8 +24,8 @@ const authenticateUser = (request, response, next) => {
       return response.status(401).json(output);
     }
 
-    request.userId = decoded.user.user_id;
-    request.userRole = decoded.user.user_role;
+    request.userId = decoded.userId;
+    request.userRole = decoded.userRole;
 
     return next();
   });

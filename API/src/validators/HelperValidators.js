@@ -7,14 +7,6 @@
 export const isString = value => typeof value === 'string';
 
 /**
- * @method isNumber
- * @description Validates that a value is a number
- * @param {unknown} value - possibly a number
- * @returns {boolean} returns true if value is a number else false
- */
-export const isNumber = value => typeof value === 'number';
-
-/**
  * @function isPositiveInteger
  * @description Validates that a value parses to an integer successfully
  * @param {unknown} value - possibly integer valued

@@ -51,7 +51,7 @@ class OrderDBQueries {
    * @returns {Array} an array of all orders
    */
   static getOrdersByUserId(userId) {
-    const query = `SELECT * FROM orders WHERE order_id=${userId}`;
+    const query = `SELECT * FROM orders WHERE user_id=${userId}`;
     return dbConnect.query(query).then(result => result.rows);
   }
 
@@ -65,6 +65,31 @@ class OrderDBQueries {
   static getAnOrderById(orderId) {
     const query = `SELECT * FROM orders WHERE order_id=${orderId}`;
     return dbConnect.query(query).then(result => result.rows[0]);
+  }
+
+  /**
+   * @static
+   * @method updateAnOrderById
+   * @param {integer} orderId - the order id
+   * @param {string} status - the new status
+   * @description Fetches an the order
+   * @returns {Array} an array of all orders
+   */
+  static updateAnOrderById(orderId, status) {
+    const query = `UPDATE orders SET order_status='${status}'
+    WHERE order_id=${orderId} RETURNING *`;
+    return dbConnect.query(query).then(result => result.rows[0]);
+  }
+
+  /**
+   * @static
+   * @method deleteAllOrders
+   * @description delete all orders
+   * @returns {undefined} undefined
+   */
+  static deleteAllOrders() {
+    const query = 'DELETE FROM orders';
+    dbConnect.query(query);
   }
 }
 
