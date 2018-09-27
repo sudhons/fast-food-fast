@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
  * @returns {Function} next middleware in the chain
  */
 const authenticateUser = (request, response, next) => {
-  const token = request.headers.Authorization ||
+  const token = request.headers.authorization ||
     request.headers['x-access-token'];
 
   if (!token) {

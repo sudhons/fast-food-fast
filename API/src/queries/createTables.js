@@ -45,16 +45,6 @@ const query = `
     menu_category category NOT NULL
   );
 
-  CREATE TABLE IF NOT EXISTS sales (
-    sale_id SERIAL PRIMARY KEY NOT NULL,
-    menu_id INTEGER REFERENCES menu(menu_id) ON DELETE CASCADE,
-    quantity INTEGER NOT NULL,
-    sales_status status NOT NULL DEFAULT 'new',
-    ordered_time TIMESTAMP NOT NULL DEFAULT NOW(),
-    unit_price DECIMAL NOT NULL,
-    total DECIMAL NOT NULL
-  );
-
   CREATE TABLE IF NOT EXISTS orders (
     order_id SERIAL PRIMARY KEY NOT NULL,
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
@@ -63,11 +53,18 @@ const query = `
     recipient_phone INTEGER NOT NULL,
     total_amount DECIMAL NOT NULL,
     order_status status DEFAULT 'new',
+    ordered_time TIMESTAMP NOT NULL DEFAULT NOW()
+  );
+
+  CREATE TABLE IF NOT EXISTS sales (
+    sale_id SERIAL PRIMARY KEY NOT NULL,
+    order_id INTEGER REFERENCES orders(order_id) ON DELETE CASCADE,
+    title VARCHAR(50) REFERENCES menu(title) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL,
+    sales_status status NOT NULL DEFAULT 'new',
     ordered_time TIMESTAMP NOT NULL DEFAULT NOW(),
-    accepted_time TIMESTAMP DEFAULT NULL,
-    declined_time TIMESTAMP DEFAULT NULL,
-    completed_time TIMESTAMP DEFAULT NULL,
-    shopping_cart integer []
+    unit_price DECIMAL NOT NULL,
+    total DECIMAL NOT NULL
   );
 `;
 
