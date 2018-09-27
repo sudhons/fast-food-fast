@@ -45,6 +45,18 @@ class OrderDBQueries {
 
   /**
    * @static
+   * @method getOrdersByUserId
+   * @param {integer} userId - the user Id
+   * @description Fetches all orders by a user
+   * @returns {Array} an array of all orders
+   */
+  static getOrdersByUserId(userId) {
+    const query = `SELECT * FROM orders WHERE order_id=${userId}`;
+    return dbConnect.query(query).then(result => result.rows);
+  }
+
+  /**
+   * @static
    * @method getAnOrder
    * @param {integer} orderId - the order id
    * @description Fetches an the order

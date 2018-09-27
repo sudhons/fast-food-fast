@@ -164,6 +164,57 @@ class OrderDBController {
         }
       });
   }
+
+  /**
+   * @static
+   * @method getAUserOrders
+   * @description Fetches an order by its id
+   * @param {object} request - HTTP Request Object
+   * @param {object} response - HTTP Response object
+   * @returns {object} status, message and order data
+   */
+  static getAUserOrders(request, response) {
+    const userId = Number(request.params.userId);
+
+    let outcome;
+
+    const done = () => {
+      response.status(200);
+      return response
+        .json({ status: 200, message: 'Successful', data: outcome });
+    };
+
+    OrderDBQueries.getOrdersByUserId(userId)
+      .then(result => (!result ? Promise.reject() : Promise.resolve(result)))
+      .then((result) => {
+        for (let count = 0; count < result.length; count += 1) {
+          ((counter) => {
+            result[counter].cart = [];
+            SalesDBQueries
+              .getSalesByOrderId(result[counter].order_id)
+              .then((sales) => {
+                sales.forEach((value) => {
+                  const {
+                    title, quantity, unit_price, total
+                  } = value;
+                  result[counter].cart.push({
+                    title, unit_price, quantity, total
+                  });
+                  if (counter === result.length - 1 &&
+                    sales.indexOf(value) === sales.length - 1) {
+                    outcome = result;
+                    done();
+                  }
+                });
+              });
+          })(count);
+        }
+      })
+      .catch(() => {
+        response.status(404);
+        return response.json({ status: 404, message: 'User does not exist' });
+      });
+  }
 }
 
 export default OrderDBController;

@@ -3,6 +3,7 @@ import {
   isString,
   isLetters,
   isEmail,
+  isPositiveInteger,
   isAlphaNumeric
 } from './HelperValidators';
 
@@ -10,6 +11,27 @@ import {
  * Validate signup and signin
  */
 class UsersValidation {
+  /**
+   * @static
+   * @method validateUserId
+   * @description Validates request's payload
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validateUserId(request, response, next) {
+    if (!isPositiveInteger(request.params.userId)) {
+      response.status(400);
+      return response.json({
+        status: 400,
+        message: 'Invalid params type'
+      });
+    }
+
+    return next();
+  }
+
   /**
    * @static
    * @method validateSignup
