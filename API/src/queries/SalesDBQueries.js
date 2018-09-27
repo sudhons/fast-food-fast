@@ -26,7 +26,7 @@ class SalesDBQueries {
 
   /**
    * @static
-   * @method createSale
+   * @method getSalesByOrderId
    * @description get sales
    * @param {integer} orderId - the order Id
    * @returns {object} the new sales
@@ -35,6 +35,20 @@ class SalesDBQueries {
     const query = `SELECT * FROM sales WHERE order_id=${orderId}`;
 
     return dbConnect.query(query).then(result => result.rows);
+  }
+
+  /**
+   * @static
+   * @method updateSalesById
+   * @param {integer} orderId - the order id
+   * @param {string} status - the new status
+   * @description Fetches an the order
+   * @returns {Array} an array of all orders
+   */
+  static updateSalesByOrderId(orderId, status) {
+    const query = `UPDATE sales SET sales_status='${status}'
+    WHERE order_id=${orderId} RETURNING *`;
+    return dbConnect.query(query).then(result => result.rows[0]);
   }
 }
 

@@ -215,6 +215,32 @@ class OrderDBController {
         return response.json({ status: 404, message: 'User does not exist' });
       });
   }
+
+  /**
+   * @static
+   * @method updateOrderStatus
+   * @description Uptates an order status
+   * @param {object} request - HTTP Request object
+   * @param {object} response - HTTP Response object
+   * @returns {object} status, message and order data
+   */
+  static updateOrderStatus(request, response) {
+    const { status } = request.body;
+    const orderId = Number(request.params.orderId);
+
+    OrderDBQueries.updateAnOrderById(orderId, status)
+      .then(result => (!result ? Promise.reject() : Promise.resolve(result)))
+      .then(() => SalesDBQueries.updateSalesByOrderId(orderId, status)
+        .then(() => {
+          response.status(200);
+          return response
+            .json({ status: 200, message: 'Successful. Status updated' });
+        }))
+      .catch(() => {
+        response.status(404);
+        return response.json({ status: 404, message: 'Order not Found' });
+      });
+  }
 }
 
 export default OrderDBController;

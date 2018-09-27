@@ -30,7 +30,7 @@ class MenuDBController {
    * @returns {object} status, message and order data
    */
   static getAMeal(request, response) {
-    MenuDBQueries.getMealById(Number(request.params.menuId))
+    MenuDBQueries.getMealById(request.params.menuId)
       .then(meal => (!meal ? Promise.reject() : Promise.resolve(meal)))
       .then((meal) => {
         response.status(200);
@@ -64,12 +64,19 @@ class MenuDBController {
       .then((newMeal) => {
         response.status(201);
         return response
-          .json({ status: 201, message: 'Successful', data: newMeal });
+          .json({
+            status: 201,
+            message: 'Successfully created a menu item',
+            data: newMeal
+          });
       })
       .catch(() => {
-        response.status(422);
+        response.status(409);
         return response
-          .json({ status: 422, message: 'Meal with the title already exist' });
+          .json({
+            status: 409,
+            message: 'Meal with the "title" already exist'
+          });
       });
   }
 }

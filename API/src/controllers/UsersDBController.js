@@ -27,18 +27,21 @@ class UsersController {
       .then(user => (user ? Promise.reject() : bcrypt.hash(password, 10)))
       .then(hash => UsersDBQueries.createUser(firstName, lastName, email, hash))
       .then((newUser) => {
-        response.status(201);
-        return response
-          .json({
-            status: 201,
-            message: 'Successful',
-            data: { userId: newUser.user_id, role: newUser.user_role }
-          });
+        jwt.sign(
+          { userId: newUser.user_id, userRole: newUser.user_role },
+          process.env.JWT_KEY,
+          { expiresIn: '10h' },
+          (error, token) => {
+            response.status(201);
+            return response
+              .json({ status: 201, message: 'Successfully signed up', token });
+          }
+        );
       })
       .catch(() => {
-        response.status(422);
+        response.status(409);
         return response
-          .json({ status: 422, message: 'Email already in use' });
+          .json({ status: 409, message: 'Unsuccessful. Email already in use' });
       });
   }
 
@@ -59,20 +62,19 @@ class UsersController {
     UsersDBQueries.getUserByEmail(email)
       .then(user => (!user ? Promise.reject() : Promise.resolve(user)))
       .then(user => bcrypt.compare(password, user.password)
-        .then((isMatch) => {
-          if (!isMatch) return Promise.reject();
-
+        .then(isMatch => (!isMatch ? Promise.reject() : Promise.resolve()))
+        .then(() => {
           jwt.sign(
-            { user },
+            { userId: user.user_id, userRole: user.user_role },
             process.env.JWT_KEY,
-            { expiresIn: '2h' },
+            { expiresIn: '10h' },
             (error, token) => {
               response.status(200);
               return response
                 .json({
                   status: 200,
-                  message: 'Successful',
-                  data: { token, userId: user.user_id, role: user.user_role }
+                  message: 'Successfully logged in',
+                  token
                 });
             }
           );
@@ -80,7 +82,7 @@ class UsersController {
       .catch(() => {
         response.status(401);
         return response
-          .json({ status: 401, message: 'Invalid credentials' });
+          .json({ status: 401, message: 'Unsuccessful. Invalid credentials' });
       });
   }
 }

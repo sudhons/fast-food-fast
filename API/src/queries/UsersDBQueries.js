@@ -17,7 +17,7 @@ class UsersDBQueries {
   static createUser(firstName, lastName, email, password) {
     const query = `INSERT INTO users (first_name, last_name, email, password)
     VALUES ('${firstName}', '${lastName}', '${email}', '${password}')
-    RETURNING user_id, user_role, email`;
+    RETURNING user_id, user_role`;
 
     return dbConnect.query(query).then(resultData => resultData.rows[0]);
   }
@@ -36,7 +36,7 @@ class UsersDBQueries {
     const query = `INSERT INTO users
     (first_name, last_name, email, password, user_role)
     VALUES ('${firstName}', '${lastName}', '${email}', '${password}', 'admin')
-    RETURNING user_id, user_role, email`;
+    RETURNING user_id, user_role`;
 
     return dbConnect.query(query).then(resultData => resultData.rows[0]);
   }

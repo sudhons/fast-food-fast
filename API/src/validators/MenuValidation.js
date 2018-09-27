@@ -1,7 +1,6 @@
 import {
   doesPropertyExist,
   isString,
-  isLetters,
   isPositiveInteger
 } from './HelperValidators';
 
@@ -19,13 +18,16 @@ class MenuValidation {
    * @returns {Function} next middleware in the chain
    */
   static validateMenuId(request, response, next) {
-    if (!isPositiveInteger(request.params.menuId)) {
+    const { menuId } = request.params;
+    if (!isPositiveInteger(menuId)) {
       response.status(400);
       return response.json({
         status: 400,
-        message: 'Invalid params type'
+        message: 'Unsuccessful. Invalid params type'
       });
     }
+
+    request.params.menuId = Number(menuId);
 
     return next();
   }
@@ -45,38 +47,63 @@ class MenuValidation {
     } = request.body;
 
     if (Object.keys(request.body).length > 4) {
-      const output = {
+      response.status(422);
+      return response.json({
         status: 422,
         message: 'Unsuccessful. Payload contains additional properties'
-      };
-      response.status(422);
-      return response.json(output);
+      });
     }
 
     title = (
       doesPropertyExist(title) && isString(title) && title.trim().length < 50
-      && isLetters(title.trim()) && title.trim().toLowerCase()
+      && /^[A-Za-z ]+$/.test(title.trim()) && title.trim().toLowerCase()
     );
+
+    if (!title) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Unsuccessful.  Letters only "title" (at most 50 characters) is required'
+      });
+    }
+
     price = (
       doesPropertyExist(price) && !Number.isNaN(Number(price))
-      && Number(price)
+      && /^[0-9]+\.?[0-9]{0,2}$/.test(price) && Number(price)
     );
+
+    if (!price) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Unsuccessful. A valid "price" (type number) is required'
+      });
+    }
+
     category = (
       doesPropertyExist(category) && isString(category)
       && ['meal', 'drink', 'dessert'].includes(category.trim().toLowerCase())
       && category.trim().toLowerCase()
     );
+
+    if (!category) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Unsuccessful. A "category" value ("meal", "drink", "dessert", "completed") is required'
+      });
+    }
+
     image = (
       doesPropertyExist(image) && isString(image) && image.trim()
     );
 
-    if (!title || !price || !category || !image) {
-      const output = {
-        status: 422,
-        message: 'Unsuccessful. Ensure required inputs are supplied and correct'
-      };
+    if (!image) {
       response.status(422);
-      return response.json(output);
+      return response.json({
+        status: 422,
+        message: 'Unsuccessful. A valid "image" link is required'
+      });
     }
 
     request.body.title = title;

@@ -26,13 +26,13 @@ const query = `
     user_role role NOT NULL DEFAULT 'customer',
     first_name VARCHAR(40) NOT NULL,
     last_name VARCHAR(40) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(40) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL
   );
 
   INSERT INTO users(first_name, last_name, email, password, user_role)
     VALUES(
-      'Oluwaseun', 'Sunday', 'sudhons@yahoo.com',
+      'oluwaseun', 'sunday', 'sudhons@yahoo.com',
       '${bcrypt.hashSync('sudhons', 10)}', 'admin'
     )
     ON CONFLICT (email) DO NOTHING;
@@ -48,8 +48,8 @@ const query = `
   CREATE TABLE IF NOT EXISTS orders (
     order_id SERIAL PRIMARY KEY NOT NULL,
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
-    recipient_name VARCHAR(100) NOT NULL,
-    recipient_address VARCHAR(200) NOT NULL,
+    recipient_name VARCHAR(80) NOT NULL,
+    recipient_address VARCHAR(120) NOT NULL,
     recipient_phone INTEGER NOT NULL,
     total_amount DECIMAL NOT NULL,
     order_status status DEFAULT 'new',

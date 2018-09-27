@@ -7,10 +7,16 @@ import UsersValidation from '../validators/UsersValidation';
 
 const menuRouter = new Router();
 
-menuRouter.get('/', MenuDBController.getAllMeals);
+menuRouter.get(
+  '/',
+  MenuDBController.getAllMeals
+);
 
-menuRouter
-  .get('/:menuId', MenuValidation.validateMenuId, MenuDBController.getAMeal);
+menuRouter.get(
+  '/:menuId',
+  MenuValidation.validateMenuId,
+  MenuDBController.getAMeal
+);
 
 menuRouter.post(
   '/',

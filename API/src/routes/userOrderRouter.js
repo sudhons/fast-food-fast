@@ -10,6 +10,7 @@ userOrderRouter.get(
   '/:userId/orders',
   authenticateUser,
   UsersValidation.validateUserId,
+  UsersValidation.validateUser,
   OrderDBController.getAUserOrders
 );
 

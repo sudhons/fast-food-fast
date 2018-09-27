@@ -3,7 +3,6 @@ import {
   isString,
   isPositiveInteger,
   isObject,
-  isLetters
 } from './HelperValidators';
 
 /**
@@ -20,13 +19,17 @@ class OrderValidation {
    * @returns {Function} next middleware in the chain
    */
   static validateOrderId(request, response, next) {
-    if (!isPositiveInteger(request.params.orderId)) {
+    const { orderId } = request.params;
+
+    if (!isPositiveInteger(orderId)) {
       response.status(400);
       return response.json({
         status: 400,
-        message: 'Invalid params type'
+        message: 'Unsuccessful. Invalid params type'
       });
     }
+
+    request.params.orderId = Number(orderId);
 
     return next();
   }
@@ -45,9 +48,18 @@ class OrderValidation {
 
     const { recipientPhone, order } = request.body;
 
+    if (Object.keys(request.body).length > 4) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Unsuccessful. Payload contains additional properties'
+      });
+    }
+
     recipientName = (
       doesPropertyExist(recipientName) && isString(recipientName)
-      && recipientName.trim().length < 100 && isLetters(recipientName.trim())
+      && recipientName.trim().length < 80
+      && /^[A-Za-z ]+$/.test(recipientName.trim())
       && recipientName.trim().toLowerCase()
     );
 
@@ -55,13 +67,14 @@ class OrderValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. Ensure recipient name is supplied and correct'
+        message: 'Unsuccessful. Letters only "recipientName" (at most 80 characters) is required'
       });
     }
 
     recipientAddress = (
       doesPropertyExist(recipientAddress) && isString(recipientAddress)
-      && recipientAddress.trim().length < 200
+      && /^[1-9][0-9]*[A-Za-z0-9,. ]+$/.test(recipientAddress.trim())
+      && recipientAddress.trim().length < 120
       && recipientAddress.trim().toLowerCase()
     );
 
@@ -70,98 +83,140 @@ class OrderValidation {
       return response.json({
         status: 422,
         message:
-          'Unsuccessful. Ensure recipient address is supplied and correct'
+          `Unsuccessful.
+ A valid "recipientAddress" (at most 120 characters) is required`
       });
     }
 
-    if (!doesPropertyExist(recipientPhone)) {
+    if (!doesPropertyExist(recipientPhone) ||
+      !isPositiveInteger(recipientPhone)) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Recipient phone number is required'
+        message: 'Unsuccessful. A valid "RecipientPhone" number is required'
       });
     }
 
-    if (!isPositiveInteger(recipientPhone)) {
+    if (!doesPropertyExist(order) || !Array.isArray(order) ||
+      order.length === 0) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Enter a valid Recipient phone number'
+        message: 'Unsuccessful. A non-empty "order" of type array is required'
       });
     }
 
-    if (!doesPropertyExist(order)) {
+    const nonObjectOrderContent = order.find(value => !isObject(value));
+    if (nonObjectOrderContent !== undefined) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Order is required'
+        message: 'Unsuccessful. Contents of "order" must be objects'
       });
     }
 
-    if (!Array.isArray(order)) {
+    const orderContentWithoutIntegerMealId = order
+      .find(value => !doesPropertyExist(value.mealId) ||
+        !isPositiveInteger(value.mealId));
+    if (orderContentWithoutIntegerMealId !== undefined) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Order must be an array'
+        message: 'Unsuccessful. Contents of "order" must have positive integer property "mealId"'
       });
     }
 
-    if (order.length === 0) {
+    const orderContentWithoutIntegerQuantity = order
+      .find(value => !doesPropertyExist(value.quantity) ||
+        !isPositiveInteger(value.quantity));
+    if (orderContentWithoutIntegerQuantity !== undefined) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Order content cannot be empty'
+        message: 'Unsuccessful. Contents of "order" must have positive integer property "quantity"'
       });
     }
 
-    const isAllObj = order.find(value => !isObject(value));
-    if (isAllObj !== undefined) {
+    return next();
+  }
+
+  /**
+   * @static
+   * @method validateStatus
+   * @description Validates request's status value
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validateStatus(request, response, next) {
+    const { status } = request.body;
+
+    const isValidStatus = !doesPropertyExist(status) && !isString(status)
+      && ['new', 'processing', 'cancelled', 'completed']
+        .includes(status.trim().toLowerCase());
+
+    if (!isValidStatus) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Contents of order must be objects'
+        message: 'Unsuccessful. A "status" value ("new", "processing", "cancelled", "completed") is required'
       });
     }
 
-    const hasPropsMealId = order
-      .find(value => !doesPropertyExist(value.mealId));
-    if (hasPropsMealId !== undefined) {
+    request.body.status = status.trim().toLowerCase();
+
+    return next();
+  }
+
+  /**
+   * @static
+   * @method validateStatus
+   * @description Validates request's status value
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validateStatus(request, response, next) {
+    const { status } = request.body;
+
+    if (!doesPropertyExist(status)) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Contents of order must have property mealId'
+        message: 'Status is required'
       });
     }
 
-    const mealIdsAreNumber = order
-      .find(value => !isPositiveInteger(value.mealId));
-    if (mealIdsAreNumber !== undefined) {
+    if (!isString(status)) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'MealId must be a number'
+        message: 'Status should be string valued'
       });
     }
 
-    const hasPropsQuantity = order
-      .find(value => !doesPropertyExist(value.quantity));
-    if (hasPropsQuantity !== undefined) {
+    if (status.trim().length === 0) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Contents of order must have property quantity'
+        message: 'Status cannot be empty string'
       });
     }
 
-    const quantitiesArePositiveNumbers = order
-      .find(value => !isPositiveInteger(value.quantity));
-    if (quantitiesArePositiveNumbers !== undefined) {
+    const isValidStatus = ['new', 'processing', 'cancelled', 'completed']
+      .includes(status.trim().toLowerCase());
+
+    if (!isValidStatus) {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Quantity must be a positive number'
+        message: 'Invalid status value'
       });
     }
+
+    request.body.status = status.trim().toLowerCase();
 
     return next();
   }

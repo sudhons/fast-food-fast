@@ -34,4 +34,13 @@ orderRouter.get(
   OrderDBController.getAnOrder
 );
 
+orderRouter.put(
+  '/orders/:orderId',
+  authenticateUser,
+  UsersValidation.validateAdmin,
+  OrderValidation.validateOrderId,
+  OrderValidation.validateStatus,
+  OrderDBController.updateOrderStatus
+);
+
 export default orderRouter;
