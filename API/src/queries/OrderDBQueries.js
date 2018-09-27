@@ -29,7 +29,17 @@ class OrderDBQueries {
     VALUES (${userId}, '${recipientName}',
     '${recipientAddress}', '${recipientPhone}', ${totalAmount}) RETURNING *`;
 
-    return dbConnect.query(query).then((result => result.rows[0]));
+    return dbConnect.query(query).then(result => result.rows[0]);
+  }
+  /**
+   * @static
+   * @method getAllOrders
+   * @description Fetches all the orders
+   * @returns {Array} an array of all orders
+   */
+  static getAllOrders() {
+    const query = 'SELECT * FROM orders';
+    return dbConnect.query(query).then(result => result.rows);
   }
 }
 

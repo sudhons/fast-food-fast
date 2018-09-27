@@ -19,4 +19,10 @@ orderRouter
     OrderDBController.postOrder
   );
 
+orderRouter.get(
+  '/orders',
+  authenticateUser,
+  OrderDBController.getAllOrders
+);
+
 export default orderRouter;

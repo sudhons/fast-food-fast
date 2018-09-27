@@ -82,6 +82,50 @@ class OrderDBController {
         });
     }
   }
+
+  /**
+   * @static
+   * @method getAllOrders
+   * @description Fetches an order by its id
+   * @param {object} request - HTTP Request Object
+   * @param {object} response - HTTP Response object
+   * @returns {object} status, message and order data
+   */
+  static getAllOrders(request, response) {
+    let outcome;
+    // let counter = 0;
+
+    const done = () => {
+      response.status(200);
+      return response
+        .json({ status: 200, message: 'Successful', data: outcome });
+    };
+
+    OrderDBQueries.getAllOrders()
+      .then((result) => {
+        for (let count = 0; count < result.length; count += 1) {
+          ((counter) => {
+            result[counter].cart = [];
+            SalesDBQueries
+              .getSalesByOrderId(result[counter].order_id)
+              .then((sales) => {
+                sales.forEach((value) => {
+                  const {
+                    title, quantity, unit_price, total
+                  } = value;
+                  result[counter].cart.push({
+                    title, unit_price, quantity, total
+                  });
+                  if (counter === result.length - 1 && sales.indexOf(value) === sales.length - 1) {
+                    outcome = result;
+                    done();
+                  }
+                });
+              });
+          })(count);
+        }
+      });
+  }
 }
 
 export default OrderDBController;

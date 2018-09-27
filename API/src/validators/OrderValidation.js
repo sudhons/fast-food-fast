@@ -1,10 +1,8 @@
 import {
   doesPropertyExist,
   isString,
-  isNumber,
   isPositiveInteger,
   isObject,
-  isAlphaNumeric,
   isLetters
 } from './HelperValidators';
 
@@ -22,9 +20,9 @@ class OrderValidation {
    * @returns {Function} next middleware in the chain
    */
   static validateOrder(request, response, next) {
-    let {
-      recipientName, recipientAddress, recipientPhone, order
-    } = request.body;
+    let { recipientName, recipientAddress } = request.body;
+
+    const { recipientPhone, order } = request.body;
 
     recipientName = (
       doesPropertyExist(recipientName) && isString(recipientName)
