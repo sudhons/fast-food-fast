@@ -12,6 +12,27 @@ import {
 class OrderValidation {
   /**
    * @static
+   * @method validateOrderId
+   * @description Validates request's payload
+   * @param {object} request - HTTP request object
+   * @param {object} response - HTTP response object
+   * @param {Function} next - next middleware in the chain
+   * @returns {Function} next middleware in the chain
+   */
+  static validateOrderId(request, response, next) {
+    if (!isPositiveInteger(request.params.orderId)) {
+      response.status(400);
+      return response.json({
+        status: 400,
+        message: 'Invalid params type'
+      });
+    }
+
+    return next();
+  }
+
+  /**
+   * @static
    * @method validateOrder
    * @description Validates request's payload
    * @param {object} request - HTTP request object

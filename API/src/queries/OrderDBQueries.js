@@ -31,6 +31,7 @@ class OrderDBQueries {
 
     return dbConnect.query(query).then(result => result.rows[0]);
   }
+
   /**
    * @static
    * @method getAllOrders
@@ -40,6 +41,18 @@ class OrderDBQueries {
   static getAllOrders() {
     const query = 'SELECT * FROM orders';
     return dbConnect.query(query).then(result => result.rows);
+  }
+
+  /**
+   * @static
+   * @method getAnOrder
+   * @param {integer} orderId - the order id
+   * @description Fetches an the order
+   * @returns {Array} an array of all orders
+   */
+  static getAnOrderById(orderId) {
+    const query = `SELECT * FROM orders WHERE order_id=${orderId}`;
+    return dbConnect.query(query).then(result => result.rows[0]);
   }
 }
 

@@ -85,6 +85,44 @@ class OrderDBController {
 
   /**
    * @static
+   * @method getAnOrders
+   * @description Fetches an order by its id
+   * @param {object} request - HTTP Request Object
+   * @param {object} response - HTTP Response object
+   * @returns {object} status, message and order data
+   */
+  static getAnOrder(request, response) {
+    const orderId = Number(request.params.orderId);
+
+    OrderDBQueries.getAnOrderById(orderId)
+      .then(order => (!order ? Promise.reject() : Promise.resolve(order)))
+      .then((order) => {
+        order.cart = [];
+        SalesDBQueries.getSalesByOrderId(orderId)
+          .then((sales) => {
+            sales.forEach((value) => {
+              const {
+                title, quantity, unit_price, total
+              } = value;
+              order.cart.push({
+                title, unit_price, quantity, total
+              });
+              if (sales.indexOf(value) === sales.length - 1) {
+                response.status(200);
+                return response
+                  .json({ status: 200, message: 'Successful', data: order });
+              }
+            });
+          });
+      })
+      .catch(() => {
+        response.status(404);
+        return response.json({ status: 404, message: 'Order not Found' });
+      });
+  }
+
+  /**
+   * @static
    * @method getAllOrders
    * @description Fetches an order by its id
    * @param {object} request - HTTP Request Object
@@ -93,7 +131,6 @@ class OrderDBController {
    */
   static getAllOrders(request, response) {
     let outcome;
-    // let counter = 0;
 
     const done = () => {
       response.status(200);
@@ -116,7 +153,8 @@ class OrderDBController {
                   result[counter].cart.push({
                     title, unit_price, quantity, total
                   });
-                  if (counter === result.length - 1 && sales.indexOf(value) === sales.length - 1) {
+                  if (counter === result.length - 1 &&
+                    sales.indexOf(value) === sales.length - 1) {
                     outcome = result;
                     done();
                   }
