@@ -34,7 +34,11 @@ class UsersController {
           (error, token) => {
             response.status(201);
             return response
-              .json({ status: 201, message: 'Successfully signed up', token });
+              .json({
+                status: 201,
+                message: 'Successfully signed up',
+                data: { token, userId: newUser.user_id }
+              });
           }
         );
       })
@@ -74,7 +78,7 @@ class UsersController {
                 .json({
                   status: 200,
                   message: 'Successfully logged in',
-                  token
+                  data: { token, userId: user.user_id }
                 });
             }
           );

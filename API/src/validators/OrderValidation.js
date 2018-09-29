@@ -73,8 +73,8 @@ class OrderValidation {
 
     recipientAddress = (
       doesPropertyExist(recipientAddress) && isString(recipientAddress)
-      && /^[1-9][0-9]*[A-Za-z0-9,. ]+$/.test(recipientAddress.trim())
       && recipientAddress.trim().length < 120
+      && /^[1-9][0-9]*[A-Za-z0-9,. ]+$/.test(recipientAddress.trim())
       && recipientAddress.trim().toLowerCase()
     );
 
@@ -83,8 +83,7 @@ class OrderValidation {
       return response.json({
         status: 422,
         message:
-          `Unsuccessful.
- A valid "recipientAddress" (at most 120 characters) is required`
+          'Unsuccessful. A valid "recipientAddress" (at most 120 characters) is required'
       });
     }
 
@@ -106,8 +105,8 @@ class OrderValidation {
       });
     }
 
-    const nonObjectOrderContent = order.find(value => !isObject(value));
-    if (nonObjectOrderContent !== undefined) {
+    const isAllObject = order.every(value => isObject(value));
+    if (!isAllObject) {
       response.status(422);
       return response.json({
         status: 422,
@@ -115,10 +114,21 @@ class OrderValidation {
       });
     }
 
-    const orderContentWithoutIntegerMealId = order
-      .find(value => !doesPropertyExist(value.mealId) ||
-        !isPositiveInteger(value.mealId));
-    if (orderContentWithoutIntegerMealId !== undefined) {
+    const hasOnlyRequiredProperties = order
+      .every(value => Object.keys(value).length <= 2);
+
+    if (!hasOnlyRequiredProperties) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Unsuccessful. Contents of "order" should have properties "mealId" and "quantity only'
+      });
+    }
+
+    const haveIntegerMealId = order
+      .every(value => doesPropertyExist(value.mealId) &&
+        isPositiveInteger(value.mealId));
+    if (!haveIntegerMealId) {
       response.status(422);
       return response.json({
         status: 422,
@@ -126,10 +136,10 @@ class OrderValidation {
       });
     }
 
-    const orderContentWithoutIntegerQuantity = order
-      .find(value => !doesPropertyExist(value.quantity) ||
-        !isPositiveInteger(value.quantity));
-    if (orderContentWithoutIntegerQuantity !== undefined) {
+    const haveIntegerQuantity = order
+      .every(value => doesPropertyExist(value.quantity) &&
+        isPositiveInteger(value.quantity));
+    if (!haveIntegerQuantity) {
       response.status(422);
       return response.json({
         status: 422,
@@ -152,7 +162,15 @@ class OrderValidation {
   static validateStatus(request, response, next) {
     const { status } = request.body;
 
-    const isValidStatus = !doesPropertyExist(status) && !isString(status)
+    if (Object.keys(request.body).length > 1) {
+      response.status(422);
+      return response.json({
+        status: 422,
+        message: 'Unsuccessful. Payload contains additional properties'
+      });
+    }
+
+    const isValidStatus = doesPropertyExist(status) && isString(status)
       && ['new', 'processing', 'cancelled', 'completed']
         .includes(status.trim().toLowerCase());
 
@@ -161,58 +179,6 @@ class OrderValidation {
       return response.json({
         status: 422,
         message: 'Unsuccessful. A "status" value ("new", "processing", "cancelled", "completed") is required'
-      });
-    }
-
-    request.body.status = status.trim().toLowerCase();
-
-    return next();
-  }
-
-  /**
-   * @static
-   * @method validateStatus
-   * @description Validates request's status value
-   * @param {object} request - HTTP request object
-   * @param {object} response - HTTP response object
-   * @param {Function} next - next middleware in the chain
-   * @returns {Function} next middleware in the chain
-   */
-  static validateStatus(request, response, next) {
-    const { status } = request.body;
-
-    if (!doesPropertyExist(status)) {
-      response.status(422);
-      return response.json({
-        status: 422,
-        message: 'Status is required'
-      });
-    }
-
-    if (!isString(status)) {
-      response.status(422);
-      return response.json({
-        status: 422,
-        message: 'Status should be string valued'
-      });
-    }
-
-    if (status.trim().length === 0) {
-      response.status(422);
-      return response.json({
-        status: 422,
-        message: 'Status cannot be empty string'
-      });
-    }
-
-    const isValidStatus = ['new', 'processing', 'cancelled', 'completed']
-      .includes(status.trim().toLowerCase());
-
-    if (!isValidStatus) {
-      response.status(422);
-      return response.json({
-        status: 422,
-        message: 'Invalid status value'
       });
     }
 

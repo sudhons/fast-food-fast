@@ -80,6 +80,17 @@ class OrderDBQueries {
     WHERE order_id=${orderId} RETURNING *`;
     return dbConnect.query(query).then(result => result.rows[0]);
   }
+
+  /**
+   * @static
+   * @method deleteAllOrders
+   * @description delete all orders
+   * @returns {undefined} undefined
+   */
+  static deleteAllOrders() {
+    const query = 'DELETE FROM orders';
+    dbConnect.query(query);
+  }
 }
 
 export default OrderDBQueries;

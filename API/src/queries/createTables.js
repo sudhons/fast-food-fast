@@ -3,6 +3,14 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '../config/dbConnect';
 
 const query = `
+  DROP TABLE IF EXISTS sales;
+  DROP TABLE IF EXISTS menu;
+  DROP TABLE IF EXISTS orders;
+  DROP TABLE IF EXISTS users;
+  DROP TYPE IF EXISTS status;
+  DROP TYPE IF EXISTS role;
+  DROP TYPE IF EXISTS category;
+
   DO $$ BEGIN
     CREATE TYPE role AS ENUM('customer', 'admin');
   EXCEPTION
@@ -50,7 +58,7 @@ const query = `
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
     recipient_name VARCHAR(80) NOT NULL,
     recipient_address VARCHAR(120) NOT NULL,
-    recipient_phone INTEGER NOT NULL,
+    recipient_phone BIGINT NOT NULL,
     total_amount DECIMAL NOT NULL,
     order_status status DEFAULT 'new',
     ordered_time TIMESTAMP NOT NULL DEFAULT NOW()

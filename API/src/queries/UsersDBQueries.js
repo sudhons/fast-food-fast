@@ -55,18 +55,6 @@ class UsersDBQueries {
 
   /**
    * @static
-   * @method getUserById
-   * @description Fetches a user
-   * @param {number} id - the user's id
-   * @returns {object} a user or undefined if user does not exist
-   */
-  static getUserById(id) {
-    const query = `SELECT * FROM users WHERE user_id=${id}`;
-    return dbConnect.query(query).then(resultData => resultData.rows[0]);
-  }
-
-  /**
-   * @static
    * @method deleteAllUsers
    * @description delete all users
    * @returns {undefined} undefined

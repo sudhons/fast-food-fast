@@ -117,7 +117,7 @@ class OrderDBController {
       })
       .catch(() => {
         response.status(404);
-        return response.json({ status: 404, message: 'Order not Found' });
+        return response.json({ status: 404, message: 'Unsuccessful. Order not Found' });
       });
   }
 
@@ -185,7 +185,6 @@ class OrderDBController {
     };
 
     OrderDBQueries.getOrdersByUserId(userId)
-      .then(result => (!result ? Promise.reject() : Promise.resolve(result)))
       .then((result) => {
         for (let count = 0; count < result.length; count += 1) {
           ((counter) => {
@@ -209,10 +208,6 @@ class OrderDBController {
               });
           })(count);
         }
-      })
-      .catch(() => {
-        response.status(404);
-        return response.json({ status: 404, message: 'User does not exist' });
       });
   }
 
@@ -238,7 +233,7 @@ class OrderDBController {
         }))
       .catch(() => {
         response.status(404);
-        return response.json({ status: 404, message: 'Order not Found' });
+        return response.json({ status: 404, message: 'Unsuccessful. Order not Found' });
       });
   }
 }

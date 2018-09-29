@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import express from 'express';
 
 import OrderDBController from '../controllers/OrderDBController';
 import authenticateUser from '../auth/authenticateUser';
 import UsersValidation from '../validators/UsersValidation';
 
-const userOrderRouter = new Router();
+const userOrderRouter = express.Router();
 
 userOrderRouter.get(
   '/:userId/orders',

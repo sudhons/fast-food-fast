@@ -193,7 +193,7 @@ class UsersValidation {
     response.status(403);
     return response.json({
       status: 403,
-      message: 'Unsuccessful. Authentication failed'
+      message: 'Unsuccessful. Not authenticated'
     });
   }
 
@@ -215,7 +215,7 @@ class UsersValidation {
     response.status(403);
     return response.json({
       status: 403,
-      message: 'Unsuccessful. Authentication failed'
+      message: 'Unsuccessful. Not authenticated'
     });
   }
 }
