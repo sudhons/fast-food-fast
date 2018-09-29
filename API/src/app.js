@@ -1,9 +1,12 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 
-import orders from './routes/ordersRoute';
 import userRouter from './routes/userRouter';
+import menuRouter from './routes/menuRouter';
+
 import createTables from './queries/createTables';
+import orderRouter from './routes/orderRouter';
+import userOrderRouter from './routes/userOrderRouter';
 
 createTables();
 
@@ -12,8 +15,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/api/v1', orders);
+app.use('/api/v1', orderRouter);
 app.use('/api/v1/auth', userRouter);
+app.use('/api/v1/menu', menuRouter);
+app.use('/api/v1/users', userOrderRouter);
 
 app.use((request, response) => {
   response.status(404);

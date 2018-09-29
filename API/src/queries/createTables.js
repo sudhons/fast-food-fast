@@ -3,6 +3,14 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '../config/dbConnect';
 
 const query = `
+  DROP TABLE IF EXISTS sales;
+  DROP TABLE IF EXISTS menu;
+  DROP TABLE IF EXISTS orders;
+  DROP TABLE IF EXISTS users;
+  DROP TYPE IF EXISTS status;
+  DROP TYPE IF EXISTS role;
+  DROP TYPE IF EXISTS category;
+
   DO $$ BEGIN
     CREATE TYPE role AS ENUM('customer', 'admin');
   EXCEPTION
@@ -15,52 +23,56 @@ const query = `
     WHEN duplicate_object THEN null;
   END $$;
 
+  DO $$ BEGIN
+    CREATE TYPE category AS ENUM('meal', 'drink', 'dessert');
+  EXCEPTION
+    WHEN duplicate_object THEN null;
+  END $$;
+
   CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY NOT NULL,
     user_role role NOT NULL DEFAULT 'customer',
     first_name VARCHAR(40) NOT NULL,
     last_name VARCHAR(40) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(40) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL
   );
 
   INSERT INTO users(first_name, last_name, email, password, user_role)
     VALUES(
-      'Oluwaseun', 'Sunday', 'sudhons@yahoo.com',
+      'oluwaseun', 'sunday', 'sudhons@yahoo.com',
       '${bcrypt.hashSync('sudhons', 10)}', 'admin'
     )
     ON CONFLICT (email) DO NOTHING;
 
   CREATE TABLE IF NOT EXISTS menu (
     menu_id SERIAL PRIMARY KEY NOT NULL,
-    title VARCHAR(50) NOT NULL,
-    price NUMERIC NOT NULL,
-    image TEXT NOT NULL
-  );
-
-  CREATE TABLE IF NOT EXISTS sales (
-    sale_id SERIAL PRIMARY KEY NOT NULL,
-    menu_id INTEGER REFERENCES menu(menu_id) ON DELETE CASCADE,
-    quantity INTEGER NOT NULL,
-    sales_status status NOT NULL DEFAULT 'new',
-    ordered_time TIMESTAMP NOT NULL DEFAULT NOW(),
-    unit_price NUMERIC NOT NULL,
-    total NUMERIC NOT NULL
+    title VARCHAR(50) NOT NULL UNIQUE,
+    price DECIMAL NOT NULL,
+    image TEXT NOT NULL,
+    menu_category category NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS orders (
     order_id SERIAL PRIMARY KEY NOT NULL,
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
-    recipient_name VARCHAR(100) NOT NULL,
-    recipient_address VARCHAR(200) NOT NULL,
-    recipient_phone INTEGER NOT NULL,
-    total_amount NUMERIC NOT NULL,
+    recipient_name VARCHAR(80) NOT NULL,
+    recipient_address VARCHAR(120) NOT NULL,
+    recipient_phone BIGINT NOT NULL,
+    total_amount DECIMAL NOT NULL,
     order_status status DEFAULT 'new',
+    ordered_time TIMESTAMP NOT NULL DEFAULT NOW()
+  );
+
+  CREATE TABLE IF NOT EXISTS sales (
+    sale_id SERIAL PRIMARY KEY NOT NULL,
+    order_id INTEGER REFERENCES orders(order_id) ON DELETE CASCADE,
+    title VARCHAR(50) REFERENCES menu(title) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL,
+    sales_status status NOT NULL DEFAULT 'new',
     ordered_time TIMESTAMP NOT NULL DEFAULT NOW(),
-    accepted_time TIMESTAMP DEFAULT NULL,
-    declined_time TIMESTAMP DEFAULT NULL,
-    completed_time TIMESTAMP DEFAULT NULL,
-    shopping_cart integer []
+    unit_price DECIMAL NOT NULL,
+    total DECIMAL NOT NULL
   );
 `;
 

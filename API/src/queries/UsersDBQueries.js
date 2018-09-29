@@ -17,7 +17,26 @@ class UsersDBQueries {
   static createUser(firstName, lastName, email, password) {
     const query = `INSERT INTO users (first_name, last_name, email, password)
     VALUES ('${firstName}', '${lastName}', '${email}', '${password}')
-    RETURNING user_id, user_role, email`;
+    RETURNING user_id, user_role`;
+
+    return dbConnect.query(query).then(resultData => resultData.rows[0]);
+  }
+
+  /**
+   * @static
+   * @method createAdmin
+   * @description creates an admin
+   * @param {string} firstName - admin's first name
+   * @param {string} lastName - admin's last name
+   * @param {string} email - admin's email
+   * @param {string} password - admin's password
+   * @returns {object} the new admin
+   */
+  static createAdmin(firstName, lastName, email, password) {
+    const query = `INSERT INTO users
+    (first_name, last_name, email, password, user_role)
+    VALUES ('${firstName}', '${lastName}', '${email}', '${password}', 'admin')
+    RETURNING user_id, user_role`;
 
     return dbConnect.query(query).then(resultData => resultData.rows[0]);
   }
@@ -31,18 +50,6 @@ class UsersDBQueries {
    */
   static getUserByEmail(email) {
     const query = `SELECT * FROM users WHERE email='${email}'`;
-    return dbConnect.query(query).then(resultData => resultData.rows[0]);
-  }
-
-  /**
-   * @static
-   * @method getUserById
-   * @description Fetches a user
-   * @param {number} id - the user's id
-   * @returns {object} a user or undefined if user does not exist
-   */
-  static getUserById(id) {
-    const query = `SELECT * FROM users WHERE user_id=${id}`;
     return dbConnect.query(query).then(resultData => resultData.rows[0]);
   }
 
