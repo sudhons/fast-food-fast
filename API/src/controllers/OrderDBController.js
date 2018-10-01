@@ -24,46 +24,6 @@ class OrderDBController {
 
     const { userId } = request;
 
-    let doesAllMealExist = true;
-
-    const done = () => {
-      if (!doesAllMealExist) {
-        response.status(404);
-        return response
-          .json({ status: 404, message: 'Menu does not exist' });
-      }
-
-      const totalAmount = order.reduce((prev, value) => prev + value.total, 0);
-
-      OrderDBQueries
-        .createNewOrder(
-          userId,
-          recipientName,
-          recipientAddress,
-          recipientPhone,
-          order,
-          totalAmount
-        )
-        .then((newOrder) => {
-          order.forEach(value => SalesDBQueries
-            .createSale(
-              newOrder.order_id,
-              value.title,
-              value.price,
-              value.quantity,
-              value.total
-            ));
-        })
-        .then(() => {
-          response.status(201);
-          return response
-            .json({
-              status: 201,
-              message: 'Order Successfully placed',
-            });
-        });
-    };
-
     for (let count = 0; count < order.length; count += 1) {
       MenuDBQueries.getMealById(order[count].mealId)
         .then(meal => (meal
@@ -73,12 +33,53 @@ class OrderDBController {
           order[count].title = meal.title;
           order[count].price = Number(meal.price);
           order[count].total = order[count].quantity * Number(meal.price);
-          if (count === order.length - 1) done();
+          if (count === order.length - 1) {
+            const totalAmount = order
+              .reduce((prev, value) => prev + value.total, 0);
+
+            OrderDBQueries
+              .createNewOrder(
+                userId,
+                recipientName,
+                recipientAddress,
+                recipientPhone,
+                order,
+                totalAmount
+              )
+              .then((newOrder) => {
+                newOrder.cart = [];
+                order.forEach(value => SalesDBQueries
+                  .createSale(
+                    newOrder.order_id,
+                    value.title,
+                    value.price,
+                    value.quantity,
+                    value.total
+                  )
+                  .then((sale) => {
+                    const {
+                      title, quantity, unit_price, total
+                    } = sale;
+                    newOrder.cart.push({
+                      title, unit_price, quantity, total
+                    });
+                    if (order.indexOf(value) === order.length - 1) {
+                      response.status(201);
+                      return response.json({
+                        status: 201,
+                        message: 'Order Successfully placed',
+                        data: newOrder
+                      });
+                    }
+                  }));
+              });
+          }
         })
         .catch(() => {
           count = 99999999;
-          doesAllMealExist = false;
-          done();
+          response.status(404);
+          return response
+            .json({ status: 404, message: 'Menu does not exist' });
         });
     }
   }
@@ -117,7 +118,10 @@ class OrderDBController {
       })
       .catch(() => {
         response.status(404);
-        return response.json({ status: 404, message: 'Unsuccessful. Order not Found' });
+        return response.json({
+          status: 404,
+          message: 'Unsuccessful. Order not Found'
+        });
       });
   }
 
@@ -130,38 +134,40 @@ class OrderDBController {
    * @returns {object} status, message and order data
    */
   static getAllOrders(request, response) {
-    let outcome;
-
-    const done = () => {
-      response.status(200);
-      return response
-        .json({ status: 200, message: 'Successful', data: outcome });
-    };
-
     OrderDBQueries.getAllOrders()
+      .then(result => (result.length
+        ? Promise.resolve(result)
+        : Promise.reject()))
       .then((result) => {
         for (let count = 0; count < result.length; count += 1) {
-          ((counter) => {
-            result[counter].cart = [];
-            SalesDBQueries
-              .getSalesByOrderId(result[counter].order_id)
-              .then((sales) => {
-                sales.forEach((value) => {
-                  const {
-                    title, quantity, unit_price, total
-                  } = value;
-                  result[counter].cart.push({
-                    title, unit_price, quantity, total
-                  });
-                  if (counter === result.length - 1 &&
-                    sales.indexOf(value) === sales.length - 1) {
-                    outcome = result;
-                    done();
-                  }
+          result[count].cart = [];
+          SalesDBQueries
+            .getSalesByOrderId(result[count].order_id)
+            .then((sales) => {
+              sales.forEach((value) => {
+                const {
+                  title, quantity, unit_price, total
+                } = value;
+                result[count].cart.push({
+                  title, unit_price, quantity, total
                 });
+                if (count === result.length - 1 &&
+                  sales.indexOf(value) === sales.length - 1) {
+                  response.status(200);
+                  return response.json({
+                    status: 200,
+                    message: 'Successful',
+                    data: result
+                  });
+                }
               });
-          })(count);
+            });
         }
+      })
+      .catch(() => {
+        response.status(200);
+        return response
+          .json({ status: 200, message: 'Successful', data: [] });
       });
   }
 
@@ -176,38 +182,40 @@ class OrderDBController {
   static getAUserOrders(request, response) {
     const userId = Number(request.params.userId);
 
-    let outcome;
-
-    const done = () => {
-      response.status(200);
-      return response
-        .json({ status: 200, message: 'Successful', data: outcome });
-    };
-
     OrderDBQueries.getOrdersByUserId(userId)
+      .then(result => (result.length
+        ? Promise.resolve(result)
+        : Promise.reject()))
       .then((result) => {
         for (let count = 0; count < result.length; count += 1) {
-          ((counter) => {
-            result[counter].cart = [];
-            SalesDBQueries
-              .getSalesByOrderId(result[counter].order_id)
-              .then((sales) => {
-                sales.forEach((value) => {
-                  const {
-                    title, quantity, unit_price, total
-                  } = value;
-                  result[counter].cart.push({
-                    title, unit_price, quantity, total
-                  });
-                  if (counter === result.length - 1 &&
-                    sales.indexOf(value) === sales.length - 1) {
-                    outcome = result;
-                    done();
-                  }
+          result[count].cart = [];
+          SalesDBQueries
+            .getSalesByOrderId(result[count].order_id)
+            .then((sales) => {
+              sales.forEach((value) => {
+                const {
+                  title, quantity, unit_price, total
+                } = value;
+                result[count].cart.push({
+                  title, unit_price, quantity, total
                 });
+                if (count === result.length - 1 &&
+                  sales.indexOf(value) === sales.length - 1) {
+                  response.status(200);
+                  return response.json({
+                    status: 200,
+                    message: 'Successful',
+                    data: result
+                  });
+                }
               });
-          })(count);
+            });
         }
+      })
+      .catch(() => {
+        response.status(200);
+        return response
+          .json({ status: 200, message: 'Successful', data: [] });
       });
   }
 
@@ -225,15 +233,31 @@ class OrderDBController {
 
     OrderDBQueries.updateAnOrderById(orderId, status)
       .then(result => (!result ? Promise.reject() : Promise.resolve(result)))
-      .then(() => SalesDBQueries.updateSalesByOrderId(orderId, status)
-        .then(() => {
-          response.status(200);
-          return response
-            .json({ status: 200, message: 'Successful. Status updated' });
+      .then(result => SalesDBQueries.updateSalesByOrderId(orderId, status)
+        .then((sales) => {
+          result.cart = [];
+          sales.forEach((value) => {
+            const {
+              title, quantity, unit_price, total
+            } = value;
+            result.cart.push({
+              title, unit_price, quantity, total
+            });
+
+            if (sales.indexOf(value) === sales.length - 1) {
+              response.status(200);
+              return response.json({
+                status: 200,
+                message: 'Successful. Status updated',
+                data: result
+              });
+            }
+          });
         }))
       .catch(() => {
         response.status(404);
-        return response.json({ status: 404, message: 'Unsuccessful. Order not Found' });
+        return response
+          .json({ status: 404, message: 'Unsuccessful. Order not Found' });
       });
   }
 }

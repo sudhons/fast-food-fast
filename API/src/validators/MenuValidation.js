@@ -63,7 +63,8 @@ class MenuValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful.  Letters only "title" (at most 50 characters) is required'
+        message:
+        'Unsuccessful. Letters only "title" (at most 50 characters) is required'
       });
     }
 
@@ -90,7 +91,8 @@ class MenuValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. A "category" value ("meal", "drink", "dessert", "completed") is required'
+        message:
+        'Unsuccessful. A "category" value ("meal", "drink", "dessert", "completed") is required'
       });
     }
 

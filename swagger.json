@@ -1,0 +1,1080 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "API docs for Food-Fast; a food ordering and delivery RESTFUL API",
+    "version": "1.0.0",
+    "title": "Food-Fast API",
+    "contact": {
+      "email": "sudhons@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "food-fast.herokuapp.com",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "Users",
+      "description": "API for users"
+    },
+    {
+      "name": "Menu",
+      "description": "API for menu"
+    },
+    {
+      "name": "Orders",
+      "description": "API for orders"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Add a new user",
+        "description": "This endpoint registers a new user",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "New user's signup credentials",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserSignUp"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created",
+            "schema": {
+              "$ref": "#/definitions/UserSignUpResponse"
+            }
+          },
+          "409": {
+            "description": "Email already in use"
+          },
+          "422": {
+            "description": "Invalid or incomplete data"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Login a user",
+        "description": "This endpoint logs in a registered user",
+        "operationId": "loginUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Registered user's login credentials",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserLoginIn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully logged in",
+            "schema": {
+              "$ref": "#/definitions/UserLogInResponse"
+            }
+          },
+          "401": {
+            "description": "Unsuccessful. Invalid credentials"
+          },
+          "422": {
+            "description": "Invalid or incomplete data"
+          }
+        }
+      }
+    },
+    "/menu": {
+      "get": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Get a list of available menu items",
+        "description": "This endpoint displays all available menu items",
+        "operationId": "getMenu",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/getMenu"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Add a new menu item",
+        "description": "This endpoint creates a new menu item",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The menu's details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/postMenu"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-access-token",
+            "description": "You need admin's token to create a menu item",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful. Menu created",
+            "schema": {
+              "$ref": "#/definitions/postMenuResponse"
+            }
+          },
+          "401": {
+            "description": "Invalid, expired or lack of token"
+          },
+          "403": {
+            "description": "Not authorized"
+          },
+          "409": {
+            "description": "Title already exist"
+          },
+          "422": {
+            "description": "Invalid or incomplete data"
+          }
+        }
+      }
+    },
+    "/menu/{menuId}": {
+      "get": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Get a menu item by its id",
+        "description": "This endpoint displays a specific menu item",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "menuId",
+            "in": "path",
+            "description": "The menu item's unique identifier",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/getAMenu"
+            }
+          },
+          "400": {
+            "description": "Invalid menu id"
+          },
+          "404": {
+            "description": "Menu item not found"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get a list of all orders",
+        "description": "This endpoint displays all orders that has been made",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-access-token",
+            "description": "You need admin's token to get orders",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/getOrders"
+            }
+          },
+          "401": {
+            "description": "Invalid, expired or lack of token"
+          },
+          "403": {
+            "description": "Unsuccessful. Not authorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Add a new order",
+        "description": "This endpoint makes a new order",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "order",
+            "description": "The order and delivery details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/postOrder"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-access-token",
+            "description": "You need a token to make an order",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/postOrderResponse"
+            }
+          },
+          "401": {
+            "description": "Invalid, expired or lack of token"
+          },
+          "404": {
+            "description": "Menu item does not exist"
+          },
+          "422": {
+            "description": "Invalid or incomplete data"
+          }
+        }
+      }
+    },
+    "/orders/{orderId}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get an order by its Id",
+        "description": "This endpoint displays a specific order",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "The order's unique identifier",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "header",
+            "name": "x-access-token",
+            "description": "You need token to get orders",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/getAnOrder"
+            }
+          },
+          "400": {
+            "description": "Invalid order Id"
+          },
+          "401": {
+            "description": "Invalid, expired or lack of token"
+          },
+          "403": {
+            "description": "Unsuccessful. Not authorized"
+          },
+          "404": {
+            "description": "Order not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Update an order's status",
+        "description": "This endpoint updates a specific order's status",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderId",
+            "description": "The order's unique identifier",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "header",
+            "name": "x-access-token",
+            "description": "You need admin's token to update order's status",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The order's new status value",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/updateStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/updateStatusResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid order Id"
+          },
+          "401": {
+            "description": "Invalid, expired or lack of token"
+          },
+          "403": {
+            "description": "Unsuccessful. Not authorized"
+          },
+          "404": {
+            "description": "Order not found"
+          },
+          "422": {
+            "description": "Invalid or incomplete data"
+          }
+        }
+      }
+    },
+    "/users/{userId}/orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get a list of orders made by the user",
+        "description": "This endpoint displays all orders made by a specific user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The user's unique identifier",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "header",
+            "name": "x-access-token",
+            "description": "You need the user's token to get the orders",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/getOrders"
+            }
+          },
+          "400": {
+            "description": "Invalid order Id"
+          },
+          "401": {
+            "description": "Invalid, expired or lack of token"
+          },
+          "403": {
+            "description": "Unsuccessful. Not authorized"
+          },
+          "404": {
+            "description": "Order not found"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "petstore_auth": {
+      "type": "oauth2",
+      "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
+      "flow": "implicit",
+      "scopes": {
+        "write:pets": "modify pets in your account",
+        "read:pets": "read your pets"
+      }
+    },
+    "api_key": {
+      "type": "apiKey",
+      "name": "api_key",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "UserSignUp": {
+      "type": "object",
+      "required": [
+        "firstName",
+        "lastName",
+        "email",
+        "password"
+      ],
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "UserLoginIn": {
+      "type": "object",
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "postMenu": {
+      "type": "object",
+      "required": [
+        "title",
+        "price",
+        "category",
+        "image"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "meal",
+            "drink",
+            "dessert"
+          ]
+        },
+        "image": {
+          "type": "string"
+        }
+      }
+    },
+    "postOrder": {
+      "type": "object",
+      "required": [
+        "recipientName",
+        "recipientAddress",
+        "recipientPhone",
+        "order"
+      ],
+      "properties": {
+        "recipientName": {
+          "type": "string"
+        },
+        "recipientAddress": {
+          "type": "string"
+        },
+        "recipientPhone": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "mealId",
+              "quantity"
+            ],
+            "properties": {
+              "mealId": {
+                "type": "integer"
+              },
+              "quantity": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "updateStatus": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "order's status",
+          "enum": [
+            "new",
+            "processing",
+            "cancelled",
+            "completed"
+          ]
+        }
+      }
+    },
+    "UserSignUpResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 201
+        },
+        "message": {
+          "type": "string",
+          "example": "Successfully signed up'"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "user_id": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "UserLogInResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        },
+        "message": {
+          "type": "string",
+          "example": "Successfully logged in'"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "user_id": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "getMenu": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        },
+        "message": {
+          "type": "string",
+          "example": "Successful"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "menu_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "title": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              },
+              "image": {
+                "type": "string"
+              },
+              "menu_category": {
+                "type": "string",
+                "enum": [
+                  "meal",
+                  "drink",
+                  "dessert"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "getAMenu": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "menu_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "title": {
+              "type": "string"
+            },
+            "price": {
+              "type": "number"
+            },
+            "image": {
+              "type": "string"
+            },
+            "menu_category": {
+              "type": "string",
+              "enum": [
+                "meal",
+                "drink",
+                "dessert"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "postMenuResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 201
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "menu_id": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "title": {
+              "type": "string"
+            },
+            "price": {
+              "type": "number"
+            },
+            "image": {
+              "type": "string"
+            },
+            "menu_category": {
+              "type": "string",
+              "enum": [
+                "meal",
+                "drink",
+                "dessert"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "getOrders": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        },
+        "message": {
+          "type": "string",
+          "example": "Successful"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "order_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "user_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "customer": {
+                "type": "string"
+              },
+              "recipient_name": {
+                "type": "string"
+              },
+              "recipient_address": {
+                "type": "string"
+              },
+              "recipient_phone": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "total_amount": {
+                "type": "number"
+              },
+              "order_status": {
+                "type": "string",
+                "enum": [
+                  "new",
+                  "processing",
+                  "cancelled",
+                  "completed"
+                ]
+              },
+              "ordered_time": {
+                "type": "string",
+                "format": "date"
+              },
+              "cart": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "unit_price": {
+                      "type": "number"
+                    },
+                    "quantity": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "postOrderResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 201
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "user_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "customer": {
+              "type": "string"
+            },
+            "recipient_name": {
+              "type": "string"
+            },
+            "recipient_address": {
+              "type": "string"
+            },
+            "recipient_phone": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "total_amount": {
+              "type": "number"
+            },
+            "order_status": {
+              "type": "string",
+              "enum": [
+                "new",
+                "processing",
+                "cancelled",
+                "completed"
+              ]
+            },
+            "ordered_time": {
+              "type": "string",
+              "format": "date"
+            },
+            "cart": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "unit_price": {
+                    "type": "number"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "total": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getAnOrder": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        },
+        "message": {
+          "type": "string",
+          "example": "Successful"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "user_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "customer": {
+              "type": "string"
+            },
+            "recipient_name": {
+              "type": "string"
+            },
+            "recipient_address": {
+              "type": "string"
+            },
+            "recipient_phone": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "total_amount": {
+              "type": "number"
+            },
+            "order_status": {
+              "type": "string",
+              "enum": [
+                "new",
+                "processing",
+                "cancelled",
+                "completed"
+              ]
+            },
+            "ordered_time": {
+              "type": "string",
+              "format": "date"
+            },
+            "cart": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "unit_price": {
+                    "type": "number"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "total": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "updateStatusResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "user_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "customer": {
+              "type": "string"
+            },
+            "recipient_name": {
+              "type": "string"
+            },
+            "recipient_address": {
+              "type": "string"
+            },
+            "recipient_phone": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "total_amount": {
+              "type": "number"
+            },
+            "order_status": {
+              "type": "string",
+              "enum": [
+                "new",
+                "processing",
+                "cancelled",
+                "completed"
+              ]
+            },
+            "ordered_time": {
+              "type": "string",
+              "format": "date"
+            },
+            "cart": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "unit_price": {
+                    "type": "number"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "total": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

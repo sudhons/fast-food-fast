@@ -3,14 +3,6 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '../config/dbConnect';
 
 const query = `
-  DROP TABLE IF EXISTS sales;
-  DROP TABLE IF EXISTS menu;
-  DROP TABLE IF EXISTS orders;
-  DROP TABLE IF EXISTS users;
-  DROP TYPE IF EXISTS status;
-  DROP TYPE IF EXISTS role;
-  DROP TYPE IF EXISTS category;
-
   DO $$ BEGIN
     CREATE TYPE role AS ENUM('customer', 'admin');
   EXCEPTION

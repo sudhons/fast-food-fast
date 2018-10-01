@@ -48,7 +48,7 @@ class SalesDBQueries {
   static updateSalesByOrderId(orderId, status) {
     const query = `UPDATE sales SET sales_status='${status}'
     WHERE order_id=${orderId} RETURNING *`;
-    return dbConnect.query(query).then(result => result.rows[0]);
+    return dbConnect.query(query).then(result => result.rows);
   }
 }
 

@@ -67,7 +67,8 @@ class OrderValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. Letters only "recipientName" (at most 80 characters) is required'
+        message:
+        'Unsuccessful. Letters only "recipientName" (at most 80 characters) is required'
       });
     }
 
@@ -83,7 +84,7 @@ class OrderValidation {
       return response.json({
         status: 422,
         message:
-          'Unsuccessful. A valid "recipientAddress" (at most 120 characters) is required'
+        'Unsuccessful. A valid "recipientAddress" (at most 120 characters) is required'
       });
     }
 
@@ -121,7 +122,8 @@ class OrderValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. Contents of "order" should have properties "mealId" and "quantity only'
+        message:
+        'Unsuccessful. Contents of "order" should have properties "mealId" and "quantity only'
       });
     }
 
@@ -132,7 +134,8 @@ class OrderValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. Contents of "order" must have positive integer property "mealId"'
+        message:
+        'Unsuccessful. Contents of "order" must have positive integer property "mealId"'
       });
     }
 
@@ -143,7 +146,8 @@ class OrderValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. Contents of "order" must have positive integer property "quantity"'
+        message:
+        'Unsuccessful. Contents of "order" must have positive integer property "quantity"'
       });
     }
 
@@ -178,7 +182,8 @@ class OrderValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. A "status" value ("new", "processing", "cancelled", "completed") is required'
+        message:
+        'Unsuccessful. A "status" value ("new", "processing", "cancelled", "completed") is required'
       });
     }
 

@@ -438,7 +438,7 @@ describe('App', () => {
         .end((error, response) => {
           assert.strictEqual(response.status, 403);
           assert.hasAllKeys(response.body, ['status', 'message']);
-          assert.strictEqual(response.body.message, 'Unsuccessful. Not authenticated');
+          assert.strictEqual(response.body.message, 'Unsuccessful. Not authorized');
           done();
         });
     });
@@ -480,7 +480,7 @@ describe('App', () => {
           assert.hasAllKeys(response.body, ['status', 'message']);
           assert.strictEqual(
             response.body.message,
-            'Unsuccessful.  Letters only "title" (at most 50 characters) is required'
+            'Unsuccessful. Letters only "title" (at most 50 characters) is required'
           );
           done();
         });
@@ -881,26 +881,11 @@ describe('App', () => {
             })
             .end((error, response) => {
               assert.strictEqual(response.status, 201);
-              assert.hasAllKeys(response.body, ['status', 'message']);
+              assert.hasAllKeys(response.body, ['status', 'message', 'data']);
               assert.strictEqual(response.body.message, 'Order Successfully placed');
+              orderId = response.body.data.order_id;
               done();
             });
-        });
-    });
-  });
-
-  describe('/GET /api/v1/orders', () => {
-    it('should GET an array of orders', (done) => {
-      chai.request(app)
-        .get('/api/v1/orders')
-        .set('x-access-token', adminToken)
-        .end((error, response) => {
-          assert.strictEqual(response.status, 200);
-          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
-          assert.strictEqual(response.body.message, 'Successful');
-          assert.isArray(response.body.data);
-          orderId = response.body.data[0].order_id;
-          done();
         });
     });
   });
@@ -996,7 +981,7 @@ describe('App', () => {
         .send({ status: orderStatus })
         .end((error, response) => {
           assert.strictEqual(response.status, 200);
-          assert.hasAllKeys(response.body, ['status', 'message']);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
           assert.strictEqual(response.body.message, 'Successful. Status updated');
           done();
         });
@@ -1023,7 +1008,20 @@ describe('App', () => {
         .end((error, response) => {
           assert.strictEqual(response.status, 403);
           assert.hasAllKeys(response.body, ['status', 'message']);
-          assert.strictEqual(response.body.message, 'Unsuccessful. Not authenticated');
+          assert.strictEqual(response.body.message, 'Unsuccessful. Not authorized');
+          done();
+        });
+    });
+
+    it('should GET should get an empty array if user has no order', (done) => {
+      chai.request(app)
+        .get(`/api/v1/users/${adminId}/orders`)
+        .set('x-access-token', adminToken)
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          assert.strictEqual(response.body.message, 'Successful');
+          assert.isEmpty(response.body.data);
           done();
         });
     });
@@ -1036,6 +1034,37 @@ describe('App', () => {
           assert.strictEqual(response.status, 200);
           assert.hasAllKeys(response.body, ['status', 'message', 'data']);
           assert.strictEqual(response.body.message, 'Successful');
+          done();
+        });
+    });
+  });
+
+  describe('/GET /api/v1/orders', () => {
+    it('should GET an array of orders', (done) => {
+      chai.request(app)
+        .get('/api/v1/orders')
+        .set('x-access-token', adminToken)
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          assert.strictEqual(response.body.message, 'Successful');
+          assert.isArray(response.body.data);
+          orderId = response.body.data[0].order_id;
+          done();
+        });
+    });
+
+    it('should GET an empty array if there are no orders', (done) => {
+      OrderDBQueries.deleteAllOrders();
+      chai.request(app)
+        .get('/api/v1/orders')
+        .set('x-access-token', adminToken)
+        .end((error, response) => {
+          assert.strictEqual(response.status, 200);
+          assert.hasAllKeys(response.body, ['status', 'message', 'data']);
+          assert.strictEqual(response.body.message, 'Successful');
+          assert.isArray(response.body.data);
+          assert.isEmpty(response.body.data);
           done();
         });
     });

@@ -68,7 +68,8 @@ class UsersValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. Letters only "firstName" (at most 40 characters) is required'
+        message:
+        'Unsuccessful. Letters only "firstName" (at most 40 characters) is required'
       });
     }
 
@@ -82,7 +83,8 @@ class UsersValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. Letters only "lastName" (at most 40 characters) is required'
+        message:
+        'Unsuccessful. Letters only "lastName" (at most 40 characters) is required'
       });
     }
 
@@ -96,7 +98,8 @@ class UsersValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. A valid "email" (at most 40 characters) is required'
+        message:
+        'Unsuccessful. A valid "email" (at most 40 characters) is required'
       });
     }
 
@@ -110,7 +113,8 @@ class UsersValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. An alphanumberic "password" (at most 40 characters) is required'
+        message:
+        'Unsuccessful. An alphanumberic "password" (at most 40 characters) is required'
       });
     }
 
@@ -152,7 +156,8 @@ class UsersValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful. A valid "email" (at most 40 characters) is required'
+        message:
+        'Unsuccessful. A valid "email" (at most 40 characters) is required'
       });
     }
 
@@ -166,7 +171,8 @@ class UsersValidation {
       response.status(422);
       return response.json({
         status: 422,
-        message: 'Unsuccessful An alphanumberic "password" (at most 40 characters) is required'
+        message:
+        'Unsuccessful An alphanumberic "password" (at most 40 characters) is required'
       });
     }
 
@@ -193,7 +199,7 @@ class UsersValidation {
     response.status(403);
     return response.json({
       status: 403,
-      message: 'Unsuccessful. Not authenticated'
+      message: 'Unsuccessful. Not authorized'
     });
   }
 
@@ -215,7 +221,7 @@ class UsersValidation {
     response.status(403);
     return response.json({
       status: 403,
-      message: 'Unsuccessful. Not authenticated'
+      message: 'Unsuccessful. Not authorized'
     });
   }
 }

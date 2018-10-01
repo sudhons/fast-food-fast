@@ -13,7 +13,7 @@ class OrderDBQueries {
    * @param {string} recipientAddress - the recipient address
    * @param {number} recipientPhone - the recipient phone number
    * @param {array} order - an array of meal
-   * @param {number} totalAmount - the total amount for the goods
+   * @param {number} totalAmount - the total price
    * @returns {object} the new order
    */
   static createNewOrder(
@@ -24,10 +24,18 @@ class OrderDBQueries {
     order,
     totalAmount
   ) {
-    const query = `INSERT INTO orders
-    (user_id, recipient_name, recipient_address, recipient_phone, total_amount)
-    VALUES (${userId}, '${recipientName}',
-    '${recipientAddress}', '${recipientPhone}', ${totalAmount}) RETURNING *`;
+    const query = `WITH result AS (
+      INSERT INTO orders
+      (user_id, recipient_name, recipient_address, recipient_phone,
+        total_amount)
+      VALUES (${userId}, '${recipientName}', '${recipientAddress}',
+      '${recipientPhone}', ${totalAmount}) RETURNING *
+      )
+      SELECT order_id, users.user_id,
+          concat_ws(' ', first_name, last_name) as customer,
+          recipient_name, recipient_address, recipient_phone,
+          total_amount, order_status, ordered_time
+      FROM result INNER JOIN users ON users.user_id=result.user_id;`;
 
     return dbConnect.query(query).then(result => result.rows[0]);
   }
@@ -39,7 +47,13 @@ class OrderDBQueries {
    * @returns {Array} an array of all orders
    */
   static getAllOrders() {
-    const query = 'SELECT * FROM orders';
+    const query = `SELECT order_id, users.user_id,
+    concat_ws(' ', first_name, last_name) as customer,
+    recipient_name, recipient_address, recipient_phone,
+    total_amount, order_status, ordered_time
+    FROM users
+    INNER JOIN orders
+    ON users.user_id=orders.user_id`;
     return dbConnect.query(query).then(result => result.rows);
   }
 
@@ -51,7 +65,14 @@ class OrderDBQueries {
    * @returns {Array} an array of all orders
    */
   static getOrdersByUserId(userId) {
-    const query = `SELECT * FROM orders WHERE user_id=${userId}`;
+    const query = `SELECT order_id, users.user_id,
+    concat_ws(' ', first_name, last_name) as customer,
+    recipient_name, recipient_address, recipient_phone,
+    total_amount, order_status, ordered_time
+    FROM users
+    INNER JOIN orders
+    ON users.user_id=orders.user_id
+    WHERE orders.user_id=${userId}`;
     return dbConnect.query(query).then(result => result.rows);
   }
 
@@ -63,7 +84,14 @@ class OrderDBQueries {
    * @returns {Array} an array of all orders
    */
   static getAnOrderById(orderId) {
-    const query = `SELECT * FROM orders WHERE order_id=${orderId}`;
+    const query = `SELECT order_id, users.user_id,
+    concat_ws(' ', first_name, last_name) as customer,
+    recipient_name, recipient_address, recipient_phone,
+    total_amount, order_status, ordered_time
+    FROM users
+    INNER JOIN orders
+    ON users.user_id=orders.user_id
+    WHERE order_id=${orderId}`;
     return dbConnect.query(query).then(result => result.rows[0]);
   }
 
@@ -76,8 +104,16 @@ class OrderDBQueries {
    * @returns {Array} an array of all orders
    */
   static updateAnOrderById(orderId, status) {
-    const query = `UPDATE orders SET order_status='${status}'
-    WHERE order_id=${orderId} RETURNING *`;
+    const query = `WITH result AS (
+      UPDATE orders SET order_status='${status}'
+      WHERE order_id=${orderId} RETURNING *
+      )
+      SELECT order_id, users.user_id,
+          concat_ws(' ', first_name, last_name) as customer,
+          recipient_name, recipient_address, recipient_phone,
+          total_amount, order_status, ordered_time
+      FROM result INNER JOIN users ON users.user_id=result.user_id`;
+
     return dbConnect.query(query).then(result => result.rows[0]);
   }
 
@@ -88,7 +124,7 @@ class OrderDBQueries {
    * @returns {undefined} undefined
    */
   static deleteAllOrders() {
-    const query = 'DELETE FROM orders';
+    const query = 'DELETE FROM orders; DELETE FROM sales';
     dbConnect.query(query);
   }
 }
