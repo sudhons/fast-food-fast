@@ -25,7 +25,6 @@
   <nav id="nav-bar">
     <ul>
       <li><a href="home.html">Home</a></li>
-      <li><a href="index.html">Login/Signup</a></li>
     </ul>
   </nav>
 
@@ -60,12 +59,13 @@
             <i class="fas fa-key"></i>
             <input class="form-input" id="confirm-password" type="password" placeholder="Confirm password" required>
           </div>
-          <button id="btn-signup" type="submit" value="signup">signup</button>
+          <button id="btn-signup" type="submit">signup</button>
           <p>Already have an account? <a id="to-login" href="#">login</a></p>
         </form>
 
         <form id="login" action="home.html" class="form" hidden>
           <h1 class="form-heading">Welcome Back!</h1>
+          <p class="alert"><span id="login-note"></span></p>
           <div>
             <i class="fas fa-at"></i>
             <input class="form-input" id="email" type="email" placeholder="Email">
@@ -74,7 +74,7 @@
             <i class="fas fa-key"></i>
             <input class="form-input" id="password" type="password" placeholder="Password">
           </div>
-          <input type="submit" value="Login">
+          <button id="btn-login" type="submit">login</button>
           <p>Don't have an account? <a id="to-signup" href="#">signup</a></p>
         </form>
       </div>
@@ -85,6 +85,7 @@
     Copyright &copy; 2018 | All Rights Reserved
   </footer>
 
+  <script src="js/jwt-decode.min.js"></script>
   <script src="js/main.js"></script>
   <script src="js/signupLogin.js"></script>
 </body>

@@ -1,9 +1,19 @@
 const signupForm = document.getElementById('signup');
 const loginForm = document.getElementById('login');
 const signupNote = document.getElementById('signup-note');
+const loginNote = document.getElementById('login-note');
 const btnSignUp = document.getElementById('btn-signup');
+const btnLogin = document.getElementById('btn-login');
 
 const baseURL = 'http://food-fast.herokuapp.com/api/v1';
+
+const jwtDecode = (t) => {
+  const token = {};
+  token.raw = t;
+  token.header = JSON.parse(window.atob(t.split('.')[0]));
+  token.payload = JSON.parse(window.atob(t.split('.')[1]));
+  return token;
+};
 
 const goToLogin = (event) => {
   event.preventDefault();
@@ -42,6 +52,16 @@ const animateSignUpBtn = (time) => {
   setTimeout(() => {
     btnSignUp.innerText = 'signup';
     btnSignUp.className = '';
+  }, time);
+};
+
+const animateLoginBtn = (time) => {
+  btnLogin.innerText = '';
+  btnLogin.className = 'btn-spinner';
+
+  setTimeout(() => {
+    btnLogin.innerText = 'login';
+    btnLogin.className = '';
   }, time);
 };
 
@@ -95,8 +115,57 @@ const signup = (event) => {
   }
 };
 
+const login = (event) => {
+  event.preventDefault();
+
+  animateLoginBtn(500);
+
+  const user = Object.create(null);
+  user.email = loginForm.email.value;
+  user.password = loginForm.password.value;
+  if (!isValidEmail(user.email) || user.email.length > 40) {
+    displayNote(loginNote, 'Invalid Email', 500);
+  } else if (user.password.length < 6) {
+    displayNote(loginNote, 'Password is 6 characters minimum', 500);
+  } else if (!isValidPassword(user.password)) {
+    displayNote(loginNote, 'Password is alphanumeric', 500);
+  } else {
+    fetch(`${baseURL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user)
+    })
+      .then(response => response.json())
+      .then(result => (result.status === 200
+        ? Promise.resolve(result.data)
+        : Promise.reject(result.message)))
+      .then((data) => {
+        displayNote(loginNote, 'Login Successful', 500, 'success');
+        localStorage.setItem('food-token', data.token);
+        const decoded = jwtDecode(data.token);
+        if (decoded.payload.userRole === 'admin') {
+          setTimeout(() => {
+            window.location.replace('./kitchen.html');
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            window.location.replace('./home.html');
+          }, 2000);
+        }
+      })
+      .catch((message) => {
+        displayNote(loginNote, message, 500);
+      });
+  }
+};
+
 document.getElementById('to-login').addEventListener('click', goToLogin);
 
 document.getElementById('to-signup').addEventListener('click', goToSignup);
 
 signupForm.addEventListener('submit', signup);
+
+loginForm.addEventListener('submit', login);
