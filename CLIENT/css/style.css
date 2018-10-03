@@ -188,7 +188,7 @@ input.form-input {
   box-sizing: border-box;
 }
 
-input[type="submit"]:hover, #btn-signup:hover {
+#btn-signup:hover, #btn-login:hover {
   background-color: rgb(32, 32, 124);
 }
 
@@ -260,7 +260,7 @@ input[type="submit"]:hover, #btn-signup:hover {
 .meal-cat {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 }
 
  .section-group {
@@ -277,9 +277,11 @@ input[type="submit"]:hover, #btn-signup:hover {
   background-color: #efefef;
   padding: 1.5rem 1rem;
   border-radius: 0.2rem;
-  min-height: 15rem;
+  max-width: 15rem;
+  height: 18rem;
   box-shadow: 0 0 .3rem #666;
   text-align: center;
+  margin: auto;
 }
 
 .items:hover {
@@ -289,6 +291,7 @@ input[type="submit"]:hover, #btn-signup:hover {
 .items img {
   width: 100%;
   height: auto;
+  height: 5.5rem;
   margin: 1rem 0;
 }
 
@@ -595,6 +598,26 @@ input[type="submit"]:hover, #btn-signup:hover {
 }
 
 @keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.page-spinner::after {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  border-radius: 50%;
+  height: 5rem;
+  width: 5rem;
+  top: 40%;
+  left: 50%;
+  border: solid .2rem grey;
+  border-top: solid rgba(47, 47, 163, 0.9);
+  animation: pg-spin 1.3s linear infinite;
+}
+
+@keyframes pg-spin {
   to {
     transform: rotate(360deg);
   }

@@ -1,11 +1,18 @@
 const signupForm = document.getElementById('signup');
 const loginForm = document.getElementById('login');
+
 const signupNote = document.getElementById('signup-note');
 const loginNote = document.getElementById('login-note');
 const btnSignUp = document.getElementById('btn-signup');
 const btnLogin = document.getElementById('btn-login');
 
 const baseURL = 'http://food-fast.herokuapp.com/api/v1';
+
+const isValidEmail = value => /^\w+@\w+\.\w+$/.test(value);
+
+const isValidPassword = value => /^[A-Za-z0-9]+$/.test(value);
+
+const isLetters = value => /^[A-Za-z]$/.test(value.trim());
 
 const jwtDecode = (t) => {
   const token = {};
@@ -27,48 +34,68 @@ const goToSignup = (event) => {
   signupForm.style.display = 'block';
 };
 
-const displayNote = (element, value, time, color = 'error') => {
-  setTimeout(() => {
-    element.innerText = value;
-    element.style.height = '2rem';
-    element.style.padding = '0.2rem';
-    element.className = color;
-  }, time);
+const displayNote = (element, value, color = 'error') => {
+  element.innerText = value;
+  element.style.height = '2rem';
+  element.style.padding = '0.2rem';
+  element.className = color;
 
   setTimeout(() => {
     element.style.height = '0rem';
     element.style.padding = '0rem';
-  }, time + 2000);
+  }, 2000);
 };
 
-const isValidEmail = value => /^\w+@\w+\.\w+$/.test(value);
-
-const isValidPassword = value => /^[A-Za-z0-9]+$/.test(value);
-
-const animateSignUpBtn = (time) => {
-  btnSignUp.innerText = '';
-  btnSignUp.className = 'btn-spinner';
-
-  setTimeout(() => {
-    btnSignUp.innerText = 'signup';
-    btnSignUp.className = '';
-  }, time);
+const animateBtn = (button) => {
+  button.innerText = '';
+  button.className = 'btn-spinner';
 };
 
-const animateLoginBtn = (time) => {
-  btnLogin.innerText = '';
-  btnLogin.className = 'btn-spinner';
+const stopBtnAnim = (button, text) => {
+  button.innerText = text;
+  button.className = '';
+};
 
-  setTimeout(() => {
-    btnLogin.innerText = 'login';
-    btnLogin.className = '';
-  }, time);
+const fetchData = (urlPath, method, status, body = null) => {
+  const token = localStorage.getItem('food-token');
+  return fetch(`${baseURL}/${urlPath}`, {
+    method,
+    body,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: token
+    },
+  })
+    .then(response => response.json())
+    .then(result => (result.status === status
+      ? Promise.resolve(result.data)
+      : Promise.reject(result.message)));
+};
+
+const validateNewUser = (newUser) => {
+  if (!isLetters(newUser.firstName)) {
+    return { value: false, message: 'Invalid first name' };
+  } else if (newUser.firstName.length > 40) {
+    return { value: false, message: 'first name is too long' };
+  } else if (!isLetters(newUser.lastName)) {
+    return { value: false, message: 'Invalid last name' };
+  } else if (newUser.lastName.length > 40) {
+    return { value: false, message: 'last name is too long' };
+  } else if (!isValidEmail(newUser.email) || newUser.email.length > 40) {
+    return { value: false, message: 'Invalid Email' };
+  } else if (newUser.password.length < 6) {
+    return { value: false, message: 'Password is 6 characters minimum' };
+  } else if (!isValidPassword(newUser.password)) {
+    return { value: false, message: 'Password is alphanumeric' };
+  }
+  return { value: true };
 };
 
 const signup = (event) => {
   event.preventDefault();
 
-  animateSignUpBtn(500);
+  animateBtn(btnSignUp);
 
   const newUser = Object.create(null);
 
@@ -76,41 +103,25 @@ const signup = (event) => {
   newUser.lastName = signupForm.lastname.value;
   newUser.email = signupForm.email.value;
   newUser.password = signupForm.password.value;
-  const password2 = signupForm['confirm-password'].value;
-  if (newUser.firstName.length > 40) {
-    displayNote(signupNote, 'first name is too long', 500);
-  } else if (newUser.lastName.length > 40) {
-    displayNote(signupNote, 'last name is too long', 500);
-  } else if (!isValidEmail(newUser.email) || newUser.email.length > 40) {
-    displayNote(signupNote, 'Invalid Email', 500);
-  } else if (newUser.password.length < 6) {
-    displayNote(signupNote, 'Password is 6 characters minimum', 500);
-  } else if (!isValidPassword(newUser.password)) {
-    displayNote(signupNote, 'Password is alphanumeric', 500);
-  } else if (newUser.password !== password2) {
-    displayNote(signupNote, 'Passwords do not match', 500);
+  const isMatch = signupForm['confirm-password'].value === newUser.password;
+
+  const newUserValidation = validateNewUser(newUser);
+
+  if (!newUserValidation.value || !isMatch) {
+    displayNote(
+      signupNote,
+      newUserValidation.message || 'passwords do not match'
+    );
+    stopBtnAnim(btnSignUp, 'signup');
   } else {
-    fetch(`${baseURL}/auth/signup`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newUser)
-    })
-      .then(response => response.json())
-      .then(result => (result.status === 201
-        ? Promise.resolve(result.data)
-        : Promise.reject(result.message)))
+    fetchData('auth/signup', 'POST', 201, JSON.stringify(newUser))
       .then((data) => {
-        displayNote(signupNote, 'Successfully registered', 500, 'success');
         localStorage.setItem('food-token', data.token);
-        setTimeout(() => {
-          window.location.replace('./home.html');
-        }, 2000);
+        window.location.replace('./home.html');
       })
       .catch((message) => {
-        displayNote(signupNote, message, 500);
+        displayNote(signupNote, message);
+        stopBtnAnim(btnSignUp, 'signup');
       });
   }
 };
@@ -118,46 +129,32 @@ const signup = (event) => {
 const login = (event) => {
   event.preventDefault();
 
-  animateLoginBtn(500);
+  animateBtn(btnLogin);
 
   const user = Object.create(null);
   user.email = loginForm.email.value;
   user.password = loginForm.password.value;
   if (!isValidEmail(user.email) || user.email.length > 40) {
-    displayNote(loginNote, 'Invalid Email', 500);
+    displayNote(loginNote, 'Invalid Email');
+    stopBtnAnim(btnLogin, 'login');
   } else if (user.password.length < 6) {
-    displayNote(loginNote, 'Password is 6 characters minimum', 500);
+    displayNote(loginNote, 'Password is 6 characters minimum');
+    stopBtnAnim(btnLogin, 'login');
   } else if (!isValidPassword(user.password)) {
-    displayNote(loginNote, 'Password is alphanumeric', 500);
+    displayNote(loginNote, 'Password is alphanumeric');
+    stopBtnAnim(btnLogin, 'login');
   } else {
-    fetch(`${baseURL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user)
-    })
-      .then(response => response.json())
-      .then(result => (result.status === 200
-        ? Promise.resolve(result.data)
-        : Promise.reject(result.message)))
+    fetchData('auth/login', 'POST', 200, JSON.stringify(user))
       .then((data) => {
-        displayNote(loginNote, 'Login Successful', 500, 'success');
         localStorage.setItem('food-token', data.token);
         const decoded = jwtDecode(data.token);
-        if (decoded.payload.userRole === 'admin') {
-          setTimeout(() => {
-            window.location.replace('./kitchen.html');
-          }, 2000);
-        } else {
-          setTimeout(() => {
-            window.location.replace('./home.html');
-          }, 2000);
-        }
+        window.location.replace(decoded.payload.userRole === 'admin'
+          ? './kitchen.html'
+          : './home.html');
       })
       .catch((message) => {
-        displayNote(loginNote, message, 500);
+        displayNote(loginNote, message);
+        stopBtnAnim(btnLogin, 'login');
       });
   }
 };
