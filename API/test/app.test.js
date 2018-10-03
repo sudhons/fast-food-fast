@@ -43,10 +43,10 @@ const orderStatus = 'CanCelled';
 const wrongStatus = 'wrong status';
 
 describe('App', () => {
-  describe('/GET /', () => {
+  describe('/GET /unknown url', () => {
     it('should return a 404 error', (done) => {
       chai.request(app)
-        .get('/')
+        .get('/unknown url')
         .end((error, response) => {
           assert.strictEqual(response.status, 404);
           assert.hasAllKeys(response.body, ['status', 'message']);
