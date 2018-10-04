@@ -27,6 +27,8 @@ const getMenu = () => {
         item.setAttribute('class', 'items');
         const title = document.createElement('h3');
         title.innerHTML = value.title;
+        const anchor = document.createElement('a');
+        anchor.setAttribute('href', value.image);
         const image = document.createElement('img');
         image.setAttribute('src', value.image);
         image.setAttribute('alt', 'meal picture');
@@ -36,8 +38,9 @@ const getMenu = () => {
         button.setAttribute('class', 'item-btn');
         button.setAttribute('dataId', value.menu_id);
         button.innerHTML = 'add to order';
+        anchor.appendChild(image);
         item.appendChild(title);
-        item.appendChild(image);
+        item.appendChild(anchor);
         item.appendChild(price);
         item.appendChild(button);
         document.querySelector(`#${value.menu_category}s .meal-cat`)

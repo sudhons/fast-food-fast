@@ -33,14 +33,53 @@
       <a id="close" href="#">&times;</a>
       <ul>
         <li class="menu-category"><a id="active" class="menu-category-link" href="#">New Orders</a></li>
-        <li class="menu-category"><a class="menu-category-link" href="#">Accepted Orders</a></li>
-        <li class="menu-category"><a class="menu-category-link" href="#">Declined Orders</a></li>
+        <li class="menu-category"><a class="menu-category-link" href="#">Processing Orders</a></li>
+        <li class="menu-category"><a class="menu-category-link" href="#">Cancelled Orders</a></li>
         <li class="menu-category"><a class="menu-category-link" href="#">Completed Orders</a></li>
+        <li class="menu-category"><a class="menu-category-link" href="#">Add Menu</a></li>
       </ul>
     </nav>
 
-    <div id="content-container"  class="page-spinner">
+    <div id="content-container" class="page-spinner">
+      <div id="new-orders" class="section-group section-orders show">
 
+      </div>
+      <div id="processing-orders" class="section-group section-orders">
+
+      </div>
+      <div id="cancelled-orders" class="section-group section-orders">
+
+      </div>
+      <div id="completed-orders" class="section-group section-orders">
+
+      </div>
+      <div id="add-menu" class="section-group">
+        <form id="new-meal" class="form">
+          <h1 class="form-heading">New Meal</h1>
+          <p class="alert"><span id="menu-note"></span></p>
+          <div>
+            <input class="form-input" id="title" type="text" placeholder="Title" required>
+          </div>
+          <div>
+            <input class="form-input" id="price" type="number" placeholder="Price" min="0" required>
+          </div>
+          <img src="" alt="" id="image">
+          <div>
+            <input class="form-input" id="meal-image" type="file" required>
+            <label for="meal-image" id="image-label">
+              Choose Image
+            </label>
+          </div>
+          <div>
+            <select name="category" id="category">
+              <option value="meal">Meals</option>
+              <option value="drink">Drinks</option>
+              <option value="dessert">Desserts</option>
+            </select>
+          </div>
+          <button id="btn-add" type="submit">add</button>
+        </form>
+      </div>
     </div>
     <a href="#"><i class="fas fa-caret-square-down"></i></a>
   </main>
@@ -49,7 +88,11 @@
     Copyright &copy; 2018 | All Rights Reserved
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+  <script src="js/jwt-decode.min.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/orders.js"></script>
+  <script src="js/kitchen.js"></script>
 </body>
 
 </html>
