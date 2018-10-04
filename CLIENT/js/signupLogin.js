@@ -12,7 +12,7 @@ const isValidEmail = value => /^\w+@\w+\.\w+$/.test(value);
 
 const isValidPassword = value => /^[A-Za-z0-9]+$/.test(value);
 
-const isLetters = value => /^[A-Za-z]$/.test(value.trim());
+const isLetters = value => /^[A-Za-z]+$/.test(value.trim());
 
 const jwtDecode = (t) => {
   const token = {};
