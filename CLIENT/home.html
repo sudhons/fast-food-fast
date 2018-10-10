@@ -35,30 +35,51 @@
         <li class="menu-category"><a id="active" class="menu-category-link" href="#">Meals</a></li>
         <li class="menu-category"><a class="menu-category-link" href="#">Drinks</a></li>
         <li class="menu-category"><a class="menu-category-link" href="#">Desserts</a></li>
-        <li class="menu-category"><a class="menu-category-link" href="#">My order</a></li>
-        <li class="menu-category"><a class="menu-category-link" href="#">Previous orders</a></li>
+        <li class="menu-category"><a class="menu-category-link" id ="cart" href="#">My Cart</a></li>
+        <li class="menu-category"><a class="menu-category-link" href="#">My Orders</a></li>
       </ul>
     </nav>
     <div id="content-container" class="page-spinner">
       <div id="meals" class="section-group show">
-          <div class="meal-cat">
-          </div>
+        <div class="meal-cat">
+        </div>
       </div>
 
       <div id="drinks" class="section-group">
-          <div class="meal-cat">
-          </div>
+        <div class="meal-cat">
+        </div>
       </div>
 
       <div id="desserts" class="section-group">
-          <div class="meal-cat">
+        <div class="meal-cat">
+        </div>
+      </div>
+
+      <div id="my-cart" class="section-group">
+        <p class="alert"><span id="order-note"></span></p>
+        <div id="orders"></div>
+        <div id="total-order"></div>
+        <hr>
+        <form id="recipient" action="" class="form">
+          <h1 class="form-heading">Delivery Details</h1>
+          <p class="alert"><span id="recipient-note"></span></p>
+          <div>
+            <i class="fas fa-user"></i>
+            <input class="form-input" id="name" type="text" placeholder="Recipient Name" required>
           </div>
+          <div>
+            <i class="fas fa-address-card"></i>
+            <input class="form-input" id="address" type="text" placeholder="Recipient Address" required>
+          </div>
+          <div>
+            <i class="fas fa-phone"></i>
+            <input class="form-input" id="phone" type="number" placeholder="Recipient Phone Number" required>
+          </div>
+          <button id="btn-order" type="submit">Place Order</button>
+        </form>
       </div>
 
-      <div id="my-order" class="section-group">
-      </div>
-
-      <div id="previous-orders" class="section-group section-orders page-spinner">
+      <div id="my-orders" class="section-group section-orders page-spinner">
       </div>
     </div>
     <a href="#"><i class="fas fa-caret-square-down"></i></a>
