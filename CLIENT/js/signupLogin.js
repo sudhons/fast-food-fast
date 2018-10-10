@@ -39,11 +39,11 @@ const displayNote = (element, value, color = 'error') => {
   element.style.height = '2rem';
   element.style.padding = '0.2rem';
   element.className = color;
+};
 
-  setTimeout(() => {
-    element.style.height = '0rem';
-    element.style.padding = '0rem';
-  }, 2000);
+const removeNote = (element) => {
+  element.style.height = '0rem';
+  element.style.padding = '0rem';
 };
 
 const animateBtn = (button) => {
@@ -163,6 +163,21 @@ document.getElementById('to-login').addEventListener('click', goToLogin);
 
 document.getElementById('to-signup').addEventListener('click', goToSignup);
 
+document.querySelectorAll('#login input')
+  .forEach(value => (
+    value.addEventListener('input', () => removeNote(loginNote))
+  ));
+
+document.querySelectorAll('#signup input')
+  .forEach(value => (
+    value.addEventListener('input', () => removeNote(signupNote))
+  ));
+
 signupForm.addEventListener('submit', signup);
 
 loginForm.addEventListener('submit', login);
+
+window.onload = () => {
+  removeNote(signupNote);
+  removeNote(loginNote);
+};
