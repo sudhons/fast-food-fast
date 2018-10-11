@@ -28,11 +28,11 @@ const displayNote = (element, value, color = 'error') => {
   element.style.height = '2rem';
   element.style.padding = '0.2rem';
   element.className = color;
+};
 
-  setTimeout(() => {
-    element.style.height = '0rem';
-    element.style.padding = '0rem';
-  }, 2000);
+const removeNote = (element) => {
+  element.style.height = '0rem';
+  element.style.padding = '0rem';
 };
 
 const animateBtn = (button) => {
@@ -121,6 +121,14 @@ imageBtn.addEventListener('change', (event) => {
 
 addMealForm.addEventListener('submit', addNewMenu);
 
+document.getElementById('new-menu')
+  .addEventListener('click', removeNote(menuNote));
+
+document.querySelectorAll('#new-meal input')
+  .forEach(value => (
+    value.addEventListener('input', () => removeNote(menuNote))
+  ));
+
 window.onload = () => {
   const token = localStorage.getItem('food-token');
   const decoded = jwtDecode(token);
@@ -129,4 +137,3 @@ window.onload = () => {
   }
   content.classList.remove('page-spinner');
 };
-

@@ -184,6 +184,7 @@ main {
   color: #333;
   background-color: #aaa;
   height: 100%;
+  width: 3rem;
   padding:  0.6rem 0.8rem;
   border-radius: .3rem 0 0 .3rem;
 }
@@ -199,7 +200,8 @@ input.form-input {
   border-radius: 0 .3rem .3rem 0;
 }
 
-#btn-signup, #btn-login, #btn-add {
+#btn-signup, #btn-login,
+#btn-add, #btn-order {
   position: relative;
   width: 100%;
   height: 2.5rem;
@@ -213,7 +215,7 @@ input.form-input {
 }
 
 #btn-signup:hover, #btn-login:hover,
-#btn-add:hover {
+#btn-add:hover, #btn-order:hover {
   background-color: rgb(32, 32, 124);
 }
 
@@ -328,34 +330,30 @@ input.form-input {
   border: none;
   border-radius: .2rem;
   padding: .5rem 1.2rem;
-  /* margin: 1.5rem auto 0; */
   margin: .5rem auto;
   cursor: pointer;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.7;
 }
 
 .item-btn:hover {
   background-color: rgb(17, 17, 206);
 }
 
-#order-btn {
-  padding: 1rem 5rem;
-  border: none;
-  background-color: #1d701d;
-  font-size: 1.2rem;
-  color: #fff;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-#order-btn:hover {
-  background-color: #0b490b;
-  padding: 1.2rem 5.2rem;
+#recipient {
+  margin: auto;
+  margin-top: 4rem;
+  max-width: 36rem;
+  text-align: center;
 }
 
 #orders {
   display: grid;
   grid-gap: 0.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 }
 
 .order-items {
@@ -364,26 +362,25 @@ input.form-input {
   background-color: #efefef;
   padding: 1rem;
   border-radius: 0.2rem;
-  min-height: 8rem;
+  max-height: 21rem;
   box-shadow: 0 0 .3rem #666;
   text-align: center;
   display: flex;
   flex-wrap: wrap;
   text-align: left;
-  max-width: 18rem;
+  max-width: 14rem;
 }
 
 .order-items img {
-  min-width: 4rem;
-  max-width: 8rem;
-  max-height: 8rem;
-  margin: 1rem 0;
+  width: 100%;
+  height: 8rem;
+  margin: 0.5rem 0;
   display: block;
 }
 
 .order-props, .my-order-props {
   min-height: 2rem;
-  margin: 1rem;
+  margin: 0.7rem;
   margin-right: 0;
 }
 
@@ -392,7 +389,7 @@ input.form-input {
   font-weight: 500;
 }
 
-#order-form input[type="number"] {
+#orders input[type="number"] {
   font-size: 1rem;
   font-weight: 1000;
   padding-left: 0.5rem;
@@ -408,19 +405,19 @@ input.form-input {
   opacity: 1;
 }
 
-#order-form .price,
-#order-form .total {
+#orders .price,
+#orders .total {
   width: 5rem;
   background-color: transparent;
   border: none !important;
   color: #000;
 }
 
-#order-form {
+#orders {
   text-align: center;
 }
 
-#order-form label {
+#orders label {
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -431,12 +428,11 @@ input.form-input {
   padding: 1rem;
 }
 
-#order-total {
-  font-size: 2.5rem !important;
-  width: 8rem;
-  background-color: transparent;
-  border: none !important;
+#total-order {
+  font-size: 2rem;
   color: #000;
+  text-align: center;
+  margin: 4rem 0;
 }
 
 #main-footer {
