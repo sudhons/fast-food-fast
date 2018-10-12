@@ -35,8 +35,8 @@
         <li class="menu-category"><a id="active" class="menu-category-link" href="#">Meals</a></li>
         <li class="menu-category"><a class="menu-category-link" href="#">Drinks</a></li>
         <li class="menu-category"><a class="menu-category-link" href="#">Desserts</a></li>
-        <li class="menu-category"><a class="menu-category-link" id ="cart" href="#">My Cart</a></li>
-        <li class="menu-category"><a class="menu-category-link" href="#">My Orders</a></li>
+        <li class="menu-category"><a class="menu-category-link" id="cart" href="#">My Cart</a></li>
+        <li class="menu-category"><a class="menu-category-link" id="prev-orders" href="#">My Orders</a></li>
       </ul>
     </nav>
     <div id="content-container" class="page-spinner">
@@ -57,7 +57,7 @@
 
       <div id="my-cart" class="section-group">
         <p class="alert"><span id="order-note"></span></p>
-        <div id="orders"></div>
+        <div id="orders" class="meal-cat"></div>
         <div id="total-order"></div>
         <hr>
         <form id="recipient" action="" class="form">
@@ -79,7 +79,16 @@
         </form>
       </div>
 
-      <div id="my-orders" class="section-group section-orders page-spinner">
+      <div id="my-orders" class="section-group">
+        <div id="my-order-note" hidden>You haven't made any order</div>
+        <div id="section-orders" hidden>
+          <div class="head">
+            <div>Order</div>
+            <div>Time</div>
+            <div>Status</div>
+          </div>
+          <ul id="user-orders"></ul>
+        </div>
       </div>
     </div>
     <a href="#"><i class="fas fa-caret-square-down"></i></a>
@@ -89,6 +98,7 @@
     Copyright &copy; 2018 | All Rights Reserved
   </footer>
 
+  <script src="js/jwt-decode.min.js"></script>
   <script src="js/main.js"></script>
   <script src="js/orders.js"></script>
   <script src="js/customer.js"></script>
