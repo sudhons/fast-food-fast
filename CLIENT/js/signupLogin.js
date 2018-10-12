@@ -7,6 +7,7 @@ const btnSignUp = document.getElementById('btn-signup');
 const btnLogin = document.getElementById('btn-login');
 
 const baseURL = 'http://food-fast.herokuapp.com/api/v1';
+// const baseURL = '/api/v1';
 
 const isValidEmail = value => /^\w+@\w+\.\w+$/.test(value);
 

@@ -47,7 +47,7 @@ class OrderDBController {
                 totalAmount
               )
               .then((newOrder) => {
-                newOrder.cart = [];
+                newOrder.items = [];
                 order.forEach(value => SalesDBQueries
                   .createSale(
                     newOrder.order_id,
@@ -60,7 +60,7 @@ class OrderDBController {
                     const {
                       title, quantity, unit_price, total
                     } = sale;
-                    newOrder.cart.push({
+                    newOrder.items.push({
                       title, unit_price, quantity, total
                     });
                     if (order.indexOf(value) === order.length - 1) {
@@ -98,14 +98,14 @@ class OrderDBController {
     OrderDBQueries.getAnOrderById(orderId)
       .then(order => (!order ? Promise.reject() : Promise.resolve(order)))
       .then((order) => {
-        order.cart = [];
+        order.items = [];
         SalesDBQueries.getSalesByOrderId(orderId)
           .then((sales) => {
             sales.forEach((value) => {
               const {
                 title, quantity, unit_price, total
               } = value;
-              order.cart.push({
+              order.items.push({
                 title, unit_price, quantity, total
               });
               if (sales.indexOf(value) === sales.length - 1) {
@@ -140,7 +140,7 @@ class OrderDBController {
         : Promise.reject()))
       .then((result) => {
         for (let count = 0; count < result.length; count += 1) {
-          result[count].cart = [];
+          result[count].items = [];
           SalesDBQueries
             .getSalesByOrderId(result[count].order_id)
             .then((sales) => {
@@ -148,7 +148,7 @@ class OrderDBController {
                 const {
                   title, quantity, unit_price, total
                 } = value;
-                result[count].cart.push({
+                result[count].items.push({
                   title, unit_price, quantity, total
                 });
                 if (count === result.length - 1 &&
@@ -188,7 +188,7 @@ class OrderDBController {
         : Promise.reject()))
       .then((result) => {
         for (let count = 0; count < result.length; count += 1) {
-          result[count].cart = [];
+          result[count].items = [];
           SalesDBQueries
             .getSalesByOrderId(result[count].order_id)
             .then((sales) => {
@@ -196,7 +196,7 @@ class OrderDBController {
                 const {
                   title, quantity, unit_price, total
                 } = value;
-                result[count].cart.push({
+                result[count].items.push({
                   title, unit_price, quantity, total
                 });
                 if (count === result.length - 1 &&
@@ -235,12 +235,12 @@ class OrderDBController {
       .then(result => (!result ? Promise.reject() : Promise.resolve(result)))
       .then(result => SalesDBQueries.updateSalesByOrderId(orderId, status)
         .then((sales) => {
-          result.cart = [];
+          result.items = [];
           sales.forEach((value) => {
             const {
               title, quantity, unit_price, total
             } = value;
-            result.cart.push({
+            result.items.push({
               title, unit_price, quantity, total
             });
 

@@ -1,15 +1,27 @@
 const baseURL = 'http://food-fast.herokuapp.com/api/v1';
+// const baseURL = '/api/v1';
 const orders = document.getElementById('orders');
 const recipientDetails = document.getElementById('recipient');
 const orderTotal = document.getElementById('total-order');
 const orderNote = document.getElementById('order-note');
 const recipientNote = document.getElementById('recipient-note');
 const placeOrderBtn = document.getElementById('btn-order');
+const myOrders = document.getElementById('my-orders');
+const myOrderNote = document.getElementById('my-order-note');
+
 let cartOrders = JSON.parse(localStorage.getItem('cartOrders')) || [];
 
 const isValidName = value => /^[A-Za-z ]+$/.test(value.trim());
 
 const isNumber = value => /^[0-9]+$/.test(value.trim());
+
+const jwtDecode = (t) => {
+  const token = {};
+  token.raw = t;
+  token.header = JSON.parse(window.atob(t.split('.')[0]));
+  token.payload = JSON.parse(window.atob(t.split('.')[1]));
+  return token;
+};
 
 const displayNote = (element, value, color = 'error') => {
   element.innerText = value;
@@ -81,11 +93,13 @@ const calcTotal = (event) => {
 const createOrderItem = (mealId, quantity, image, price, title) => {
   const orderItems = document.createElement('div');
   orderItems.setAttribute('class', 'order-items');
-  const heading = document.createElement('h3');
-  heading.innerText = title;
-  orderItems.appendChild(heading);
 
   const div1 = document.createElement('div');
+
+  const heading = document.createElement('h3');
+  heading.innerText = title;
+  div1.appendChild(heading);
+
   const img = document.createElement('img');
   img.setAttribute('src', image);
   img.setAttribute('alt', 'food item picture');
@@ -252,6 +266,113 @@ const getMenu = () => {
     .catch();
 };
 
+const orderDetail = (event) => {
+  event.preventDefault();
+  const orderDetailSection = event
+    .target.parentElement.parentElement.nextElementSibling;
+  if (orderDetailSection.style.height === '20rem') {
+    orderDetailSection.style.height = '';
+    event.target.style.transform = 'rotate(0deg)';
+  } else {
+    orderDetailSection.style.height = '20rem';
+    event.target.style.transform = 'rotate(90deg)';
+  }
+};
+
+const getOrderPropsRow = (propsName, propsValue) => `<tr>
+    <th class="order-props">${propsName}</th>
+    <td class="order-props-val ${propsName === 'Status:' ? propsValue : ''}">
+      ${propsValue}
+    </td>
+  </tr>`;
+
+const getItemRow = ({
+  title,
+  quantity,
+  unit_price: unitPrice,
+  total
+}) => `<tr>
+      <td>${title}</td>
+      <td>${quantity}</td>
+      <td>${unitPrice}</td>
+      <td>${total}</td>
+    </tr>`;
+
+const getOrderAmtTable = value => `<table class="order-amount">
+    <thead>
+      <tr>
+        <th>Meal</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${value.items
+    .reduce((combined, item) => `${combined} ${getItemRow(item)}`, '')}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="3">Order Total</th>
+        <th>${value.total_amount}</th>
+      </tr>
+    </tfoot>
+  </table>`;
+
+const getOrderDataTable = value => `<table class="order-data">
+    ${getOrderPropsRow('Order ID:', value.order_id)}
+    ${getOrderPropsRow('Status:', value.order_status)}
+    ${getOrderPropsRow('Customer:', value.customer)}
+    ${getOrderPropsRow('Recipient Name:', value.recipient_name)}
+    ${getOrderPropsRow('Recipient Address:', value.recipient_address)}
+    ${getOrderPropsRow('Recipient Phone Number:', value.recipient_phone)}
+    ${getOrderPropsRow(
+    'Time of Order:',
+    `${new Date(value.ordered_time).toDateString()}`
+  )}
+  </table>`;
+
+const getOrders = () => {
+  document.getElementById('user-orders').innerHTML = '';
+  document.getElementById('section-orders').style.display = 'none';
+  myOrderNote.style.display = 'none';
+  myOrders.classList.add('page-spinner');
+  const { userId } = jwtDecode(localStorage.getItem('food-token')).payload;
+  fetchData(`users/${userId}/orders`, 'GET', 200)
+    .then((data) => {
+      myOrders.classList.remove('page-spinner');
+      if (data.length === 0) {
+        myOrderNote.style.display = 'block';
+      } else {
+        data.forEach((value) => {
+          const order = `<li>
+          <div class="order-table">
+            <div class="show-order">
+              <i class="fas fa-angle-right"></i>
+                ${value.order_id}
+            </div>
+            <div class="date">
+              ${new Date(value.ordered_time).toDateString()}
+            </div>
+            <div class="${value.order_status}">
+              ${value.order_status}
+            </div>
+          </div>
+          <div class="order-detail">
+            ${getOrderAmtTable(value)}
+            ${getOrderDataTable(value)}
+          </div>
+        </li>`;
+          document.getElementById('section-orders').style.display = 'block';
+          document.getElementById('user-orders').innerHTML += order;
+          document.querySelectorAll('.fa-angle-right')
+            .forEach(element => element.addEventListener('click', orderDetail));
+        });
+      }
+    })
+    .catch();
+};
+
 const animateBtn = (button) => {
   button.innerText = '';
   button.className = 'btn-spinner';
@@ -307,12 +428,20 @@ const placeOrder = (event) => {
   }
 };
 
+document.getElementById('prev-orders').addEventListener('click', getOrders);
+
 document.querySelectorAll('#recipient input')
   .forEach(value => (
     value.addEventListener('input', () => removeNote(recipientNote))
   ));
 
 recipientDetails.addEventListener('submit', placeOrder);
+
 document.getElementById('cart').addEventListener('click', loadOrders);
 
-window.onload = getMenu();
+window.onload = () => {
+  const token = localStorage.getItem('food-token');
+  if (token) getMenu();
+  else window.location.replace('/');
+};
+
