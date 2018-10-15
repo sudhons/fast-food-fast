@@ -24,7 +24,7 @@
   </header>
   <nav id="nav-bar">
     <ul>
-      <li><a href="index.html">Log out</a></li>
+      <li><a id="logout" href="index.html">Log out</a></li>
     </ul>
   </nav>
 
@@ -80,8 +80,8 @@
       </div>
 
       <div id="my-orders" class="section-group">
-        <div id="my-order-note" hidden>You haven't made any order</div>
-        <div id="section-orders" hidden>
+        <div class="no-orders" id="my-order-note" hidden>You haven't made any order</div>
+        <div class="section-orders" hidden>
           <div class="head">
             <div>Order</div>
             <div>Time</div>
@@ -99,7 +99,6 @@
   </footer>
 
   <script src="js/jwt-decode.min.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/orders.js"></script>
   <script src="js/customer.js"></script>
 </body>
