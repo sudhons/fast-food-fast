@@ -24,7 +24,8 @@
   </header>
   <nav id="nav-bar">
     <ul>
-      <li><a href="index.html">Log out</a></li>
+      <li><a href="home.html">Home</a></li>
+      <li><a id="logout" href="index.html">Log out</a></li>
     </ul>
   </nav>
 
@@ -32,7 +33,9 @@
     <nav id="menu-bar">
       <a id="close" href="#">&times;</a>
       <ul>
-        <li class="menu-category"><a id="active" class="menu-category-link" href="#">New Orders</a></li>
+        <li class="menu-category" id="all-orders">
+          <a id="active" class="menu-category-link" href="#">New Orders</a>
+        </li>
         <li class="menu-category"><a class="menu-category-link" href="#">Processing Orders</a></li>
         <li class="menu-category"><a class="menu-category-link" href="#">Cancelled Orders</a></li>
         <li class="menu-category"><a class="menu-category-link" href="#">Completed Orders</a></li>
@@ -40,18 +43,50 @@
       </ul>
     </nav>
 
-    <div id="content-container" class="page-spinner">
-      <div id="new-orders" class="section-group section-orders show">
-
+    <div id="content-container">
+      <div id="new-orders" class="section-group show">
+        <div class="no-orders" id="new-orders-note" hidden>There are no new orders</div>
+        <div class="section-orders" hidden>
+          <div class="head">
+            <div>Order</div>
+            <div>Accept</div>
+            <div>Decline</div>
+          </div>
+          <ul class="admin-orders"></ul>
+        </div>
       </div>
-      <div id="processing-orders" class="section-group section-orders">
-
+      <div id="processing-orders" class="section-group">
+        <div class="no-orders" id="processing-orders-note" hidden>There are no proccessing orders</div>
+        <div class="section-orders" hidden>
+          <div class="head">
+            <div>Order</div>
+            <div>Time</div>
+            <div>Complete</div>
+          </div>
+          <ul class="admin-orders"></ul>
+        </div>
       </div>
-      <div id="cancelled-orders" class="section-group section-orders">
-
+      <div id="cancelled-orders" class="section-group">
+        <div class="no-orders" id="cancelled-orders-note" hidden>There are no cancelled orders</div>
+        <div class="section-orders" hidden>
+          <div class="head">
+            <div>Order</div>
+            <div>Time</div>
+            <div>Status</div>
+          </div>
+          <ul class="admin-orders"></ul>
+        </div>
       </div>
-      <div id="completed-orders" class="section-group section-orders">
-
+      <div id="completed-orders" class="section-group">
+        <div class="no-orders" id="completed-orders-note" hidden>There are no completed orders</div>
+        <div class="section-orders" hidden>
+          <div class="head">
+            <div>Order</div>
+            <div>Time</div>
+            <div>Status</div>
+          </div>
+          <ul class="admin-orders"></ul>
+        </div>
       </div>
       <div id="add-menu" class="section-group">
         <form id="new-meal" class="form">
@@ -90,7 +125,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
   <script src="js/jwt-decode.min.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/orders.js"></script>
   <script src="js/kitchen.js"></script>
 </body>

@@ -1,5 +1,4 @@
 const baseURL = 'http://food-fast.herokuapp.com/api/v1';
-// const baseURL = '/api/v1';
 const orders = document.getElementById('orders');
 const recipientDetails = document.getElementById('recipient');
 const orderTotal = document.getElementById('total-order');
@@ -14,14 +13,6 @@ let cartOrders = JSON.parse(localStorage.getItem('cartOrders')) || [];
 const isValidName = value => /^[A-Za-z ]+$/.test(value.trim());
 
 const isNumber = value => /^[0-9]+$/.test(value.trim());
-
-const jwtDecode = (t) => {
-  const token = {};
-  token.raw = t;
-  token.header = JSON.parse(window.atob(t.split('.')[0]));
-  token.payload = JSON.parse(window.atob(t.split('.')[1]));
-  return token;
-};
 
 const displayNote = (element, value, color = 'error') => {
   element.innerText = value;
@@ -334,7 +325,7 @@ const getOrderDataTable = value => `<table class="order-data">
 
 const getOrders = () => {
   document.getElementById('user-orders').innerHTML = '';
-  document.getElementById('section-orders').style.display = 'none';
+  document.querySelector('.section-orders').style.display = 'none';
   myOrderNote.style.display = 'none';
   myOrders.classList.add('page-spinner');
   const { userId } = jwtDecode(localStorage.getItem('food-token')).payload;
@@ -349,13 +340,13 @@ const getOrders = () => {
           <div class="order-table">
             <div class="show-order">
               <i class="fas fa-angle-right"></i>
-                ${value.order_id}
+                <span>${value.order_id}</span>
             </div>
             <div class="date">
-              ${new Date(value.ordered_time).toDateString()}
+              <span>${new Date(value.ordered_time).toDateString()}</span>
             </div>
             <div class="${value.order_status}">
-              ${value.order_status}
+              <span>${value.order_status}</span>
             </div>
           </div>
           <div class="order-detail">
@@ -363,7 +354,7 @@ const getOrders = () => {
             ${getOrderDataTable(value)}
           </div>
         </li>`;
-          document.getElementById('section-orders').style.display = 'block';
+          document.querySelector('.section-orders').style.display = 'block';
           document.getElementById('user-orders').innerHTML += order;
           document.querySelectorAll('.fa-angle-right')
             .forEach(element => element.addEventListener('click', orderDetail));
@@ -441,7 +432,25 @@ document.getElementById('cart').addEventListener('click', loadOrders);
 
 window.onload = () => {
   const token = localStorage.getItem('food-token');
-  if (token) getMenu();
-  else window.location.replace('/');
+  if (token) {
+    getMenu();
+  } else window.location.replace('/');
 };
 
+window.onload = () => {
+  const token = localStorage.getItem('food-token');
+  if (!token) {
+    window.location.replace('/');
+  } else if (jwtDecode(token).payload.userRole === 'admin') {
+    document.querySelector('#nav-bar ul')
+      .insertAdjacentHTML(
+        'afterbegin',
+        '<li><a href="kitchen.html">Kitchen</a></li>'
+      );
+    getMenu();
+  } else if (jwtDecode(token).payload.userRole === 'customer') {
+    getMenu();
+  } else {
+    window.location.replace('/');
+  }
+};

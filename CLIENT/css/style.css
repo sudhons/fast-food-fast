@@ -424,7 +424,7 @@ input.form-input {
 }
 
 #total-order,
-#my-order-note {
+.no-orders {
   font-size: 2rem;
   color: #000;
   text-align: center;
@@ -472,13 +472,18 @@ input.form-input {
 }
 
 .order-table > div {
-  padding: 0.6rem 0;
+  padding: 0.2rem 0;
+}
+
+.order-table span {
+  display: block;
+  padding: 0.4rem 0;
 }
 
 .order-table a {
   display: block;
+  padding: .4rem;
   text-decoration: none;
-  padding: 0.7rem;
   color: #000;
 }
 
@@ -492,7 +497,7 @@ input.form-input {
 
 .fa-angle-right {
   display: block;
-  padding-left: .4rem;
+  padding: .4rem;
   font-size: 1.3rem;
   float: left;
   transform: rotate(0deg);
@@ -510,13 +515,13 @@ input.form-input {
   padding: .6rem;
 }
 
-#section-orders {
+.section-orders {
   box-shadow: 0 0 .5rem #4f4f4f;
   border-bottom: solid 3rem  #aaa;
   min-height: 100%;
 }
 
-#section-orders li {
+.section-orders li {
   margin: .1rem 0;
 }
 
@@ -562,6 +567,10 @@ input.form-input {
   color: brown;
 }
 
+.complete > a {
+  background-color: green;
+}
+
 .completed {
   color: green;
 }
@@ -574,6 +583,14 @@ input.form-input {
   color: rgb(173, 173, 22);
 }
 
+.accept > a {
+  background-color: rgb(26, 26, 87);
+}
+
+.decline > a {
+  background-color: red;
+}
+
 .date {
   background-color: #cecece;
 }
@@ -581,7 +598,6 @@ input.form-input {
 .status-btn {
   display: inline-block !important;
   font-size: 1rem;
-  padding: .5rem !important;
   border-radius: .3rem;
   color: #fff !important;
   min-width: 6rem;

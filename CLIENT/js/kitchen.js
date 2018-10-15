@@ -5,19 +5,23 @@ const imageBtn = document.getElementById('meal-image');
 const imageView = document.getElementById('image');
 const imageLabel = document.getElementById('image-label');
 const content = document.getElementById('content-container');
+const newOrdersNote = document.getElementById('new-orders-note');
+const processingOrdersNote = document.getElementById('processing-orders-note');
+const cancelledOrdersNote = document.getElementById('cancelled-orders-note');
+const completedOrdersNote = document.getElementById('completed-orders-note');
+const newSectionOrders = document.querySelector('#new-orders .section-orders');
+const processingSectionOrders = document
+  .querySelector('#processing-orders .section-orders');
+const cancelledSectionOrders = document
+  .querySelector('#cancelled-orders .section-orders');
+const completedSectionOrders = document
+  .querySelector('#completed-orders .section-orders');
+
 
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/sudhons/upload';
 const CLOUDINARY_PRESET = 'hzzmreyc';
 
 const baseURL = 'http://food-fast.herokuapp.com/api/v1';
-
-const jwtDecode = (t) => {
-  const token = {};
-  token.raw = t;
-  token.header = JSON.parse(window.atob(t.split('.')[0]));
-  token.payload = JSON.parse(window.atob(t.split('.')[1]));
-  return token;
-};
 
 const isValidTitle = value => /^[A-Za-z ]+$/.test(value.trim());
 
@@ -100,6 +104,159 @@ const addNewMenu = (event) => {
   }
 };
 
+const orderDetail = (event) => {
+  event.preventDefault();
+  const orderDetailSection = event
+    .target.parentElement.parentElement.nextElementSibling;
+  if (orderDetailSection.style.height === '20rem') {
+    orderDetailSection.style.height = '';
+    event.target.style.transform = 'rotate(0deg)';
+  } else {
+    orderDetailSection.style.height = '20rem';
+    event.target.style.transform = 'rotate(90deg)';
+  }
+};
+
+const getOrderPropsRow = (propsName, propsValue) => `<tr>
+    <th class="order-props">${propsName}</th>
+    <td class="order-props-val ${propsName === 'Status:' ? propsValue : ''}">
+      ${propsValue}
+    </td>
+  </tr>`;
+
+const getItemRow = ({
+  title,
+  quantity,
+  unit_price: unitPrice,
+  total
+}) => `<tr>
+      <td>${title}</td>
+      <td>${quantity}</td>
+      <td>${unitPrice}</td>
+      <td>${total}</td>
+    </tr>`;
+
+const getOrderAmtTable = value => `<table class="order-amount">
+    <thead>
+      <tr>
+        <th>Meal</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${value.items
+    .reduce((combined, item) => `${combined} ${getItemRow(item)}`, '')}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="3">Order Total</th>
+        <th>${value.total_amount}</th>
+      </tr>
+    </tfoot>
+  </table>`;
+
+const getOrderDataTable = value => `<table class="order-data">
+  ${getOrderPropsRow('Order ID:', value.order_id)}
+  ${getOrderPropsRow('Status:', value.order_status)}
+  ${getOrderPropsRow('Customer:', value.customer)}
+  ${getOrderPropsRow('Recipient Name:', value.recipient_name)}
+  ${getOrderPropsRow('Recipient Address:', value.recipient_address)}
+  ${getOrderPropsRow('Recipient Phone Number:', value.recipient_phone)}
+  ${getOrderPropsRow(
+    'Time of Order:',
+    `${new Date(value.ordered_time).toDateString()}`
+  )}
+</table>`;
+
+const adminGetOrders = () => {
+  document.getElementById('new-orders').classList.add('page-spinner');
+  document.querySelectorAll('.admin-orders')
+    .forEach((value) => {
+      value.innerHTML = '';
+    });
+  newOrdersNote.style.display = 'none';
+  processingOrdersNote.style.display = 'none';
+  cancelledOrdersNote.style.display = 'none';
+  completedOrdersNote.style.display = 'none';
+  newSectionOrders.style.display = 'none';
+  processingSectionOrders.style.display = 'none';
+  cancelledSectionOrders.style.display = 'none';
+  completedSectionOrders.style.display = 'none';
+  fetchData('orders', 'GET', 200)
+    .then((data) => {
+      document.getElementById('new-orders').classList.remove('page-spinner');
+      data.forEach((value) => {
+        const order = `<li>
+  <div class="order-table">
+    <div class="show-order">
+      <i class="fas fa-angle-right"></i>
+        <span>${value.order_id}</span>
+    </div>
+    ${(() => {
+            if (value.order_status === 'processing') {
+              return `<div class="date">
+          <span>${new Date(value.ordered_time).toDateString()}</span>
+        </div>
+        <div class="complete">
+          <a class="status-btn" href="#">Complete</a>
+        </div>
+        `;
+            } else if (value.order_status === 'new') {
+              return `<div class="accept">
+          <a class="status-btn" href="#">Accept</a>
+        </div>
+        <div class="decline">
+          <a class="status-btn" href="#">Decline</a>
+        </div>
+        `;
+            }
+            return `<div class="date">
+          <span>${new Date(value.ordered_time).toDateString()}</span>
+        </div>
+        <div class="${value.order_status}">
+          <span>${value.order_status}</span>
+        </div>
+        `;
+          })()}
+  </div>
+  <div class="order-detail">
+    ${getOrderAmtTable(value)}
+    ${getOrderDataTable(value)}
+  </div>
+</li>`;
+        document.querySelector(`#${value.order_status}-orders .admin-orders`)
+          .innerHTML += order;
+      });
+      document.querySelectorAll('.fa-angle-right')
+        .forEach(element => element.addEventListener('click', orderDetail));
+      if (document.querySelector('#new-orders .admin-orders').hasChildNodes()) {
+        newSectionOrders.style.display = 'block';
+      } else {
+        newOrdersNote.style.display = 'block';
+      }
+      if (document.querySelector('#processing-orders .admin-orders')
+        .hasChildNodes()) {
+        processingSectionOrders.style.display = 'block';
+      } else {
+        processingOrdersNote.style.display = 'block';
+      }
+      if (document.querySelector('#cancelled-orders .admin-orders')
+        .hasChildNodes()) {
+        cancelledSectionOrders.style.display = 'block';
+      } else {
+        cancelledOrdersNote.style.display = 'block';
+      }
+      if (document.querySelector('#completed-orders .admin-orders')
+        .hasChildNodes()) {
+        completedSectionOrders.style.display = 'block';
+      } else {
+        completedOrdersNote.style.display = 'block';
+      }
+    });
+};
+
 imageBtn.addEventListener('change', (event) => {
   animateBtn(imageLabel);
   const file = event.target.files[0];
@@ -129,11 +286,19 @@ document.querySelectorAll('#new-meal input')
     value.addEventListener('input', () => removeNote(menuNote))
   ));
 
+document.getElementById('all-orders')
+  .addEventListener('click', adminGetOrders);
+
 window.onload = () => {
   const token = localStorage.getItem('food-token');
-  const decoded = jwtDecode(token);
-  if (decoded.payload.userRole !== 'admin') {
+  if (!token) {
+    window.location.replace('/');
+  } else if (jwtDecode(token).payload.userRole === 'admin') {
+    content.classList.remove('page-spinner');
+    adminGetOrders();
+  } else if (jwtDecode(token).payload.userRole === 'customer') {
+    window.location.replace('home.html');
+  } else {
     window.location.replace('/');
   }
-  content.classList.remove('page-spinner');
 };
