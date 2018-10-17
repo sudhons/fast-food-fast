@@ -596,11 +596,13 @@ input.form-input {
 }
 
 .status-btn {
+  position: relative;
   display: inline-block !important;
   font-size: 1rem;
   border-radius: .3rem;
   color: #fff !important;
   min-width: 6rem;
+  min-height: 2.13rem;
 }
 
 /* SPINNERS */
