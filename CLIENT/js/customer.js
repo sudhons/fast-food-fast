@@ -318,7 +318,7 @@ const getOrderDataTable = value => `<table class="order-data">
     ${getOrderPropsRow('Recipient Address:', value.recipient_address)}
     ${getOrderPropsRow('Recipient Phone Number:', value.recipient_phone)}
     ${getOrderPropsRow(
-    'Time of Order:',
+    'Date:',
     `${new Date(value.ordered_time).toDateString()}`
   )}
   </table>`;

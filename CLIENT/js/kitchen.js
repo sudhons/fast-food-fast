@@ -41,12 +41,12 @@ const removeNote = (element) => {
 
 const animateBtn = (button) => {
   button.innerText = '';
-  button.className = 'btn-spinner';
+  button.classList.add('btn-spinner');
 };
 
 const stopBtnAnim = (button, text) => {
   button.innerText = text;
-  button.className = '';
+  button.classList.remove('btn-spinner');
 };
 
 const fetchData = (urlPath, method, status, body = null) => {
@@ -165,10 +165,132 @@ const getOrderDataTable = value => `<table class="order-data">
   ${getOrderPropsRow('Recipient Address:', value.recipient_address)}
   ${getOrderPropsRow('Recipient Phone Number:', value.recipient_phone)}
   ${getOrderPropsRow(
-    'Time of Order:',
+    'Date:',
     `${new Date(value.ordered_time).toDateString()}`
   )}
 </table>`;
+
+const completeOrder = (event) => {
+  event.preventDefault();
+  const orderId = event.target.getAttribute('data-id');
+  const status = { status: 'completed' };
+  animateBtn(event.target);
+  fetchData(`orders/${orderId}`, 'PUT', 200, JSON.stringify(status))
+    .then((value) => {
+      event.target.parentElement.parentElement.parentElement.remove();
+      if (!document.querySelector('#processing-orders .admin-orders')
+        .hasChildNodes()) {
+        processingOrdersNote.style.display = 'block';
+        processingSectionOrders.style.display = 'none';
+      }
+      completedOrdersNote.style.display = 'none';
+      completedSectionOrders.style.display = 'block';
+      const order = `<li>
+  <div class="order-table">
+    <div class="show-order">
+      <i class="fas fa-angle-right"></i>
+        <span>${value.order_id}</span>
+    </div>
+    <div class="date">
+        <span>${new Date(value.ordered_time).toDateString()}</span>
+    </div>
+    <div class="${value.order_status}">
+        <span>${value.order_status}</span>
+      </div>  
+  </div>
+  <div class="order-detail">
+    ${getOrderAmtTable(value)}
+    ${getOrderDataTable(value)}
+  </div>
+</li>`;
+      document.querySelector(`#${value.order_status}-orders .admin-orders`)
+        .innerHTML += order;
+      document.querySelectorAll('.fa-angle-right')
+        .forEach(element => element.addEventListener('click', orderDetail));
+    });
+};
+
+const acceptOrder = (event) => {
+  event.preventDefault();
+  const orderId = event.target.getAttribute('data-id');
+  const status = { status: 'processing' };
+  animateBtn(event.target);
+  fetchData(`orders/${orderId}`, 'PUT', 200, JSON.stringify(status))
+    .then((value) => {
+      event.target.parentElement.parentElement.parentElement.remove();
+      if (!document.querySelector('#new-orders .admin-orders')
+        .hasChildNodes()) {
+        newOrdersNote.style.display = 'block';
+        newSectionOrders.style.display = 'none';
+      }
+      processingOrdersNote.style.display = 'none';
+      processingSectionOrders.style.display = 'block';
+      const order = `<li>
+  <div class="order-table">
+    <div class="show-order">
+      <i class="fas fa-angle-right"></i>
+        <span>${value.order_id}</span>
+    </div>
+    <div class="date">
+      <span>${new Date(value.ordered_time).toDateString()}</span>
+    </div>
+    <div class="complete">
+      <a class="status-btn" data-id="${value.order_id}" href="#">Complete</a>
+    </div>
+  </div>
+  <div class="order-detail">
+    ${getOrderAmtTable(value)}
+    ${getOrderDataTable(value)}
+  </div>
+</li>`;
+      document.querySelector(`#${value.order_status}-orders .admin-orders`)
+        .innerHTML += order;
+      document.querySelectorAll(' .complete a')
+        .forEach(btn => btn.addEventListener('click', completeOrder));
+      document.querySelectorAll('.fa-angle-right')
+        .forEach(element => element.addEventListener('click', orderDetail));
+    });
+};
+
+const declineOrder = (event) => {
+  event.preventDefault();
+  const orderId = event.target.getAttribute('data-id');
+  const status = { status: 'cancelled' };
+  animateBtn(event.target);
+  fetchData(`orders/${orderId}`, 'PUT', 200, JSON.stringify(status))
+    .then((value) => {
+      event.target.parentElement.parentElement.parentElement.remove();
+      if (!document.querySelector('#new-orders .admin-orders')
+        .hasChildNodes()) {
+        newOrdersNote.style.display = 'block';
+        newSectionOrders.style.display = 'none';
+      }
+      cancelledOrdersNote.style.display = 'none';
+      cancelledSectionOrders.style.display = 'block';
+      const order = `<li>
+    <div class="order-table">
+      <div class="show-order">
+        <i class="fas fa-angle-right"></i>
+          <span>${value.order_id}</span>
+      </div>
+      <div class="date">
+          <span>${new Date(value.ordered_time).toDateString()}</span>
+      </div>
+      <div class="${value.order_status}">
+          <span>${value.order_status}</span>
+        </div>  
+    </div>
+    <div class="order-detail">
+      ${getOrderAmtTable(value)}
+      ${getOrderDataTable(value)}
+    </div>
+  </li>`;
+      document.querySelector(`#${value.order_status}-orders .admin-orders`)
+        .innerHTML += order;
+      document.querySelectorAll('.fa-angle-right')
+        .forEach(element => element.addEventListener('click', orderDetail));
+    });
+};
 
 const adminGetOrders = () => {
   document.getElementById('new-orders').classList.add('page-spinner');
@@ -195,31 +317,31 @@ const adminGetOrders = () => {
         <span>${value.order_id}</span>
     </div>
     ${(() => {
-            if (value.order_status === 'processing') {
-              return `<div class="date">
+    if (value.order_status === 'processing') {
+      return `<div class="date">
           <span>${new Date(value.ordered_time).toDateString()}</span>
         </div>
         <div class="complete">
-          <a class="status-btn" href="#">Complete</a>
+          <a class="status-btn" data-id="${value.order_id}" href="#">Complete</a>
         </div>
         `;
-            } else if (value.order_status === 'new') {
-              return `<div class="accept">
-          <a class="status-btn" href="#">Accept</a>
+    } else if (value.order_status === 'new') {
+      return `<div class="accept">
+          <a class="status-btn" data-id="${value.order_id}" href="#">Accept</a>
         </div>
         <div class="decline">
-          <a class="status-btn" href="#">Decline</a>
+          <a class="status-btn" data-id="${value.order_id}" href="#">Decline</a>
         </div>
         `;
-            }
-            return `<div class="date">
+    }
+    return `<div class="date">
           <span>${new Date(value.ordered_time).toDateString()}</span>
         </div>
         <div class="${value.order_status}">
           <span>${value.order_status}</span>
         </div>
         `;
-          })()}
+  })()}
   </div>
   <div class="order-detail">
     ${getOrderAmtTable(value)}
@@ -254,6 +376,12 @@ const adminGetOrders = () => {
       } else {
         completedOrdersNote.style.display = 'block';
       }
+      document.querySelectorAll(' .accept a')
+        .forEach(btn => btn.addEventListener('click', acceptOrder));
+      document.querySelectorAll(' .decline a')
+        .forEach(btn => btn.addEventListener('click', declineOrder));
+      document.querySelectorAll(' .complete a')
+        .forEach(btn => btn.addEventListener('click', completeOrder));
     });
 };
 
