@@ -825,7 +825,7 @@
                 "type": "string",
                 "format": "date"
               },
-              "cart": {
+              "items": {
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -901,7 +901,7 @@
               "type": "string",
               "format": "date"
             },
-            "cart": {
+            "items": {
               "type": "array",
               "items": {
                 "type": "object",
@@ -977,7 +977,7 @@
               "type": "string",
               "format": "date"
             },
-            "cart": {
+            "items": {
               "type": "array",
               "items": {
                 "type": "object",
@@ -1052,7 +1052,7 @@
               "type": "string",
               "format": "date"
             },
-            "cart": {
+            "items": {
               "type": "array",
               "items": {
                 "type": "object",
