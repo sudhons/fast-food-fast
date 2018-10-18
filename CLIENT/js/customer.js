@@ -1,4 +1,4 @@
-const baseURL = 'http://food-fast.herokuapp.com/api/v1';
+const baseURL = 'https://food-fast.herokuapp.com/api/v1';
 const orders = document.getElementById('orders');
 const recipientDetails = document.getElementById('recipient');
 const orderTotal = document.getElementById('total-order');

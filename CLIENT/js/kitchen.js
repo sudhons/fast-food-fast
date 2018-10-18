@@ -21,7 +21,7 @@ const completedSectionOrders = document
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/sudhons/upload';
 const CLOUDINARY_PRESET = 'hzzmreyc';
 
-const baseURL = 'http://food-fast.herokuapp.com/api/v1';
+const baseURL = 'https://food-fast.herokuapp.com/api/v1';
 
 const isValidTitle = value => /^[A-Za-z ]+$/.test(value.trim());
 
