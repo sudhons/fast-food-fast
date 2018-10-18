@@ -30,7 +30,6 @@ class UsersController {
         jwt.sign(
           { userId: newUser.user_id, userRole: newUser.user_role },
           process.env.JWT_KEY,
-          { expiresIn: '10h' },
           (error, token) => {
             response.status(201);
             return response
@@ -71,7 +70,6 @@ class UsersController {
           jwt.sign(
             { userId: user.user_id, userRole: user.user_role },
             process.env.JWT_KEY,
-            { expiresIn: '10h' },
             (error, token) => {
               response.status(200);
               return response
