@@ -277,7 +277,7 @@ class OrderDBController {
       .then((order) => {
         if (order.user_id !== request.userId) {
           return response.json({
-            status: 404,
+            status: 403,
             message: 'Unsuccessful. Not authorised to delete this order'
           });
         }
