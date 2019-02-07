@@ -222,7 +222,7 @@ class OrderDBController {
   /**
    * @static
    * @method updateOrderStatus
-   * @description Uptates an order status
+   * @description Updates an order status
    * @param {object} request - HTTP Request object
    * @param {object} response - HTTP Response object
    * @returns {object} status, message and order data
@@ -258,6 +258,41 @@ class OrderDBController {
         response.status(404);
         return response
           .json({ status: 404, message: 'Unsuccessful. Order not Found' });
+      });
+  }
+
+  /**
+   * @static
+   * @method deleteAnOrder
+   * @description Deletes an order
+   * @param {object} request - HTTP Request object
+   * @param {object} response - HTTP Response object
+   * @returns {object} status, message and order data
+   */
+  static deleteAnOrder(request, response) {
+    const orderId = Number(request.params.orderId);
+
+    OrderDBQueries.getAnOrderById(orderId)
+      .then(order => (!order ? Promise.reject() : Promise.resolve(order)))
+      .then((order) => {
+        if (order.user_id !== request.userId) {
+          return response.json({
+            status: 403,
+            message: 'Unsuccessful. Not authorised to delete this order'
+          });
+        }
+        OrderDBQueries.deleteAnOrder(orderId)
+          .then(() => response.json({
+            status: 200,
+            message: 'Successful. Order deleted'
+          }));
+      })
+      .catch(() => {
+        response.status(404);
+        return response.json({
+          status: 404,
+          message: 'Unsuccessful. Order not Found'
+        });
       });
   }
 }

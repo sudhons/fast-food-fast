@@ -43,4 +43,11 @@ orderRouter.put(
   OrderDBController.updateOrderStatus
 );
 
+orderRouter.delete(
+  '/orders/:orderId',
+  authenticateUser,
+  OrderValidation.validateOrderId,
+  OrderDBController.deleteAnOrder
+);
+
 export default orderRouter;

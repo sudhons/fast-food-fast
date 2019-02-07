@@ -119,6 +119,19 @@ class OrderDBQueries {
 
   /**
    * @static
+   * @method deleteAnOrder
+   * @description delete an order
+   * @param {integer} orderId - order's Id
+   * @returns {undefined} undefined
+   */
+  static deleteAnOrder(orderId) {
+    const query = `DELETE FROM orders WHERE order_id=${orderId};
+    DELETE FROM sales WHERE order_id=${orderId}`;
+    return dbConnect.query(query);
+  }
+
+  /**
+   * @static
    * @method deleteAllOrders
    * @description delete all orders
    * @returns {undefined} undefined
