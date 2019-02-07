@@ -282,13 +282,10 @@ class OrderDBController {
           });
         }
         OrderDBQueries.deleteAnOrder(orderId)
-          .then((result) => {
-            console.log('\n', result, '\n');
-            return response.json({
-              status: 200,
-              message: 'Successful. Order deleted'
-            });
-          });
+          .then(() => response.json({
+            status: 200,
+            message: 'Successful. Order deleted'
+          }));
       })
       .catch(() => {
         response.status(404);
